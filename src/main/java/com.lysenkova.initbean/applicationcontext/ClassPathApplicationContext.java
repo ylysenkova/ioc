@@ -4,6 +4,7 @@ import com.lysenkova.initbean.beanparser.BeanDefinitionReader;
 import com.lysenkova.initbean.beanparser.XMLBeanDefinitionReader;
 import com.lysenkova.initbean.entity.Bean;
 import com.lysenkova.initbean.entity.BeanDefinition;
+import com.lysenkova.initbean.exception.BeanInstantiationException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -18,7 +19,7 @@ public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
     private List<Bean> beans;
     private List<BeanDefinition> beanDefinitions;
 
-    public ClassPathApplicationContext(String[] paths) throws InstantiationException, IllegalAccessException, NoSuchMethodException, ClassNotFoundException, InvocationTargetException {
+    public ClassPathApplicationContext(String[] paths) throws Exception, BeanInstantiationException {
         createBeansFromBeanDefinitions();
         injectDependencies();
         injectRefDependencies();
@@ -91,7 +92,7 @@ public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
         }
     }
 
-    private void injectDependencies() throws IllegalAccessException, InvocationTargetException {
+    private void injectDependencies() throws IllegalAccessException, InvocationTargetException, BeanInstantiationException {
         for (Bean bean : beans) {
             for (BeanDefinition beanDefinition : beanDefinitions) {
                 if (bean.getId().equalsIgnoreCase(beanDefinition.getId())) {
@@ -108,8 +109,16 @@ public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
                                             method.invoke(bean.getValue(), Integer.parseInt(beanDependency.getValue()));
                                         } else if (field.getType().equals(Double.class)) {
                                             method.invoke(bean.getValue(), Double.parseDouble(beanDependency.getValue()));
-                                        } else {
+                                        } else if (field.getType().equals(String.class)) {
                                             method.invoke(bean.getValue(), beanDependency.getValue());
+                                        } else {
+                                            throw new BeanInstantiationException("Bean [ "
+                                                    + bean.getId()
+                                                    + "] can not be initialized. Type ["
+                                                    + field.getType()
+                                                    + "] of filed ["
+                                                    + field.getName()
+                                                    + "] can not be converted from String.");
                                         }
 
                                     }
