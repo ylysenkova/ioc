@@ -14,7 +14,8 @@ public class XMLBeanDefinitionReader implements BeanDefinitionReader {
     private String[] paths;
     private List<BeanDefinition> beanDefinitions;
 
-    public XMLBeanDefinitionReader() {
+    public XMLBeanDefinitionReader(String[] paths) {
+        readBeanDefinitions();
     }
 
     public List<BeanDefinition> readBeanDefinitions() {
