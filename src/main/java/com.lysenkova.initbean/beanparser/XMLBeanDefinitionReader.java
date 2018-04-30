@@ -14,10 +14,11 @@ public class XMLBeanDefinitionReader implements BeanDefinitionReader {
     private String[] paths;
     private List<BeanDefinition> beanDefinitions;
 
-    public XMLBeanDefinitionReader() {
+    public XMLBeanDefinitionReader(String[] paths) {
+        this.paths=paths;
     }
 
-    public List<BeanDefinition> readBeanDefinitions() {
+    public List<BeanDefinition> readBeanDefinitions() throws RuntimeException{
         SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
         try {
             SAXParser saxParser = saxParserFactory.newSAXParser();
@@ -26,10 +27,8 @@ public class XMLBeanDefinitionReader implements BeanDefinitionReader {
                 saxParser.parse(path, beanParserHandler);
                 beanDefinitions = beanParserHandler.getBeanDefinitions();
             }
-        } catch (SAXException | ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException();
         }
 
         return beanDefinitions;
