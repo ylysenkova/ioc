@@ -7,11 +7,6 @@ public class Bean {
     public Bean() {
     }
 
-    public Bean(Object value, String id) {
-        this.value = value;
-        this.id = id;
-    }
-
     public Object getValue() {
         return value;
     }

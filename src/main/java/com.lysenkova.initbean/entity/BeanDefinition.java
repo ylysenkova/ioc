@@ -11,13 +11,6 @@ public class BeanDefinition {
     public BeanDefinition() {
     }
 
-    public BeanDefinition(String id, String beanClassName, Map<String, String> dependencies, Map<String, String> refDependencies) {
-        this.id = id;
-        this.beanClassName = beanClassName;
-        this.dependencies = dependencies;
-        this.refDependencies = refDependencies;
-    }
-
     public String getId() {
         return id;
     }
