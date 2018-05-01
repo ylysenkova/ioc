@@ -2,12 +2,9 @@ package com.lysenkova.initbean.beanparser;
 
 import com.lysenkova.initbean.beanparser.utils.BeanParserHandler;
 import com.lysenkova.initbean.entity.BeanDefinition;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,10 +1,14 @@
 package com.lysenkova.initbean.exception;
 
-public class BeanInstantiationException extends Throwable {
+public class BeanInstantiationException extends RuntimeException {
     public BeanInstantiationException() {
     }
 
     public BeanInstantiationException(String message) {
         super(message);
+    }
+
+    public BeanInstantiationException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
