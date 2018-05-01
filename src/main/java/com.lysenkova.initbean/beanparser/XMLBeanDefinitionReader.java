@@ -8,29 +8,28 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class XMLBeanDefinitionReader implements BeanDefinitionReader {
     private String[] paths;
-    private List<BeanDefinition> beanDefinitions;
+    private List<BeanDefinition> beanDefinitions = new ArrayList<>();
 
     public XMLBeanDefinitionReader(String[] paths) {
-        readBeanDefinitions();
+        this.paths=paths;
     }
 
-    public List<BeanDefinition> readBeanDefinitions() {
+    public List<BeanDefinition> readBeanDefinitions() throws RuntimeException{
         SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
         try {
             SAXParser saxParser = saxParserFactory.newSAXParser();
             BeanParserHandler beanParserHandler = new BeanParserHandler();
             for (String path : paths) {
                 saxParser.parse(path, beanParserHandler);
-                beanDefinitions = beanParserHandler.getBeanDefinitions();
+                beanDefinitions.addAll(beanParserHandler.getBeanDefinitions());
             }
-        } catch (SAXException | ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException();
         }
 
         return beanDefinitions;
