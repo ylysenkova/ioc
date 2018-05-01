@@ -1,6 +1,6 @@
-package com.lysenkova.initbean.beanparser;
+package com.lysenkova.ioc.beanparser;
 
-import com.lysenkova.initbean.beanparser.utils.BeanParserHandler;
+import com.lysenkova.ioc.beanparser.utils.BeanParserHandler;
 import com.lysenkova.initbean.entity.BeanDefinition;
 
 import javax.xml.parsers.SAXParser;

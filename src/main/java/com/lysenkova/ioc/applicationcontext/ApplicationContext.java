@@ -1,4 +1,4 @@
-package com.lysenkova.initbean.applicationcontext;
+package com.lysenkova.ioc.applicationcontext;
 
 import com.lysenkova.initbean.beanparser.BeanDefinitionReader;
 

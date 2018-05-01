@@ -1,4 +1,4 @@
-package com.lysenkova.initbean.beanparser;
+package com.lysenkova.ioc.beanparser;
 
 import com.lysenkova.initbean.entity.BeanDefinition;
 

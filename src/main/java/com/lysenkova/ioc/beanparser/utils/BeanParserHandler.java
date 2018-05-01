@@ -1,4 +1,4 @@
-package com.lysenkova.initbean.beanparser.utils;
+package com.lysenkova.ioc.beanparser.utils;
 
 import com.lysenkova.initbean.entity.BeanDefinition;
 import org.xml.sax.Attributes;

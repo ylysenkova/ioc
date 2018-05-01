@@ -1,4 +1,4 @@
-package com.lysenkova.initbean.exception;
+package com.lysenkova.ioc.exception;
 
 public class BeanInstantiationException extends RuntimeException {
     public BeanInstantiationException() {

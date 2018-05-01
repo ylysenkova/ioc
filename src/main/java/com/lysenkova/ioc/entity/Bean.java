@@ -1,4 +1,4 @@
-package com.lysenkova.initbean.entity;
+package com.lysenkova.ioc.entity;
 
 public class Bean {
     private Object value;
