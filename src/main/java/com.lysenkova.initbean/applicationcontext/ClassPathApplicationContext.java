@@ -12,36 +12,47 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
+public class ClassPathApplicationContext implements ApplicationContext {
     private String[] paths;
     private BeanDefinitionReader reader;
     private List<Bean> beans;
     private List<BeanDefinition> beanDefinitions;
 
-    public ClassPathApplicationContext(String[] paths) throws InstantiationException, IllegalAccessException, NoSuchMethodException, ClassNotFoundException, InvocationTargetException {
+    public ClassPathApplicationContext() {
+        setBeanDefinitionReader(reader);
+    }
+
+    public ClassPathApplicationContext(String path) {
+        this(new String[]{path});
+    }
+
+    public ClassPathApplicationContext(String[] paths) throws RuntimeException {
+        beans = new ArrayList<>();
+        beanDefinitions = new ArrayList<>();
+        setBeanDefinitionReader(reader);
         createBeansFromBeanDefinitions();
         injectDependencies();
         injectRefDependencies();
     }
 
     @Override
-    public T getBean(Class<T> clazz) {
+    public <T> T getBean(Class<T> clazz) {
         for (Bean bean : beans) {
             if (bean.getValue().equals(clazz)) {
-                return (T) bean.getValue();
+                return clazz.cast(bean.getValue());
             }
         }
-        return null;
+        throw new RuntimeException("Bean was not found for Class: " + clazz);
     }
 
     @Override
-    public T getBean(String name, Class<T> clazz) {
+    public <T> T getBean(String name, Class<T> clazz) {
         for (Bean bean : beans) {
-            if (bean.getId().equals(name) && bean.getValue().getClass().equals(clazz)) {
-                return (T) bean.getValue();
+            if (bean.getId().equals(name)) {
+                return clazz.cast(getBean(clazz));
             }
         }
-        return null;
+        throw new RuntimeException("Bean was not found for Class: " + clazz);
     }
 
     @Override
@@ -51,109 +62,90 @@ public class ClassPathApplicationContext<T> implements ApplicationContext<T> {
                 return bean.getValue();
             }
         }
-        return null;
+        throw new RuntimeException("Bean with id: " + name + " not found.");
     }
 
     @Override
     public List<String> getBeanNames() {
         List<String> beanNames = new ArrayList<>();
         for (Bean bean : beans) {
-            beanNames.add(bean.getValue().toString());
+            beanNames.add(bean.getId());
         }
         return beanNames;
     }
 
     @Override
     public void setBeanDefinitionReader(BeanDefinitionReader beanDefinitionReader) {
-        String xml = ".xml";
-        for (String path : paths) {
-            if (path.endsWith(xml)) {
-                String[] xmlPaths = new String[paths.length];
-                for (int i = 0; i < xmlPaths.length; i++) {
-                    xmlPaths[i] = path;
-                }
-                reader = new XMLBeanDefinitionReader(xmlPaths);
-            }
-        }
-
+        this.reader = beanDefinitionReader;
     }
 
-    private void createBeansFromBeanDefinitions() throws IllegalAccessException, InstantiationException, ClassNotFoundException {
-        beans = new ArrayList<>();
-        beanDefinitions = new ArrayList<>();
-        setBeanDefinitionReader(reader);
+    private void createBeansFromBeanDefinitions() throws RuntimeException {
         beanDefinitions = reader.readBeanDefinitions();
         for (BeanDefinition beanDefinition : beanDefinitions) {
-            Bean bean = new Bean();
-            bean.setId(beanDefinition.getId());
-            bean.setValue(Class.forName(beanDefinition.getBeanClassName()).newInstance());
-            beans.add(bean);
+            try {
+                Bean bean = new Bean();
+                bean.setId(beanDefinition.getId());
+                bean.setValue(Class.forName(beanDefinition.getBeanClassName()).newInstance());
+                beans.add(bean);
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                throw new RuntimeException("Bean creation error.");
+            }
         }
     }
 
-    private void injectDependencies() throws IllegalAccessException, InvocationTargetException {
-        for (Bean bean : beans) {
-            for (BeanDefinition beanDefinition : beanDefinitions) {
-                if (bean.getId().equalsIgnoreCase(beanDefinition.getId())) {
-                    Field[] fields = bean.getValue().getClass().getDeclaredFields();
-                    for (Field field : fields) {
-                        Map<String, String> beanDependencies = beanDefinition.getDependencies();
-                        for (Map.Entry<String, String> beanDependency : beanDependencies.entrySet()) {
-                            if (beanDependency.getKey().equals(field.getName())) {
-                                String setter = "set" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
-                                Method[] methods = bean.getValue().getClass().getDeclaredMethods();
-                                for (Method method : methods) {
-                                    if (method.getName().equals(setter)) {
-                                        if (field.getType().equals(Integer.class)) {
-                                            method.invoke(bean.getValue(), Integer.parseInt(beanDependency.getValue()));
-                                        } else if (field.getType().equals(Double.class)) {
-                                            method.invoke(bean.getValue(), Double.parseDouble(beanDependency.getValue()));
-                                        } else {
-                                            method.invoke(bean.getValue(), beanDependency.getValue());
-                                        }
 
-                                    }
+    private void injectDependencies() {
+        for (BeanDefinition beanDefinition : beanDefinitions) {
+            Object beanName = getBean(beanDefinition.getId());
+            Class beanClass = beanName.getClass();
+            Map<String, String> dependencies = beanDefinition.getDependencies();
+            for (String fieldName : dependencies.keySet()) {
+                injectValueDependency(fieldName, beanClass, beanName, dependencies.get(fieldName));
+            }
+        }
+    }
 
-                                }
-                            }
 
-                        }
-
-                    }
+    private void injectRefDependencies() {
+        for (BeanDefinition beanDefinition : beanDefinitions) {
+            Object beanName = getBean(beanDefinition.getId());
+            Class beanClass = beanName.getClass();
+            Map<String, String> beanRefDependencies = beanDefinition.getRefDependencies();
+            if (beanRefDependencies == null) {
+                return;
+            } else {
+                for (String fieldName : beanRefDependencies.keySet()) {
+                    injectValueDependency(fieldName, beanClass, beanName, beanRefDependencies.get(fieldName));
                 }
             }
         }
     }
 
-    private void injectRefDependencies() throws InvocationTargetException, IllegalAccessException {
-        for (Bean bean : beans) {
-            for (BeanDefinition beanDefinition : beanDefinitions) {
-                if (bean.getId().equalsIgnoreCase(beanDefinition.getId())) {
-                    Field[] fields = bean.getValue().getClass().getDeclaredFields();
-                    for (Field field : fields) {
-                        Map<String, String> beanRefDependencies = beanDefinition.getRefDependencies();
-                        if (beanRefDependencies == null) {
-                            return;
-                        } else {
-                            for (Map.Entry<String, String> beanRefDependency : beanRefDependencies.entrySet()) {
-                                if (beanRefDependency.getKey().equals(field.getName())) {
-                                    String setter = "set" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
-                                    Method[] methods = bean.getValue().getClass().getDeclaredMethods();
-                                    for (Method method : methods) {
-                                        if (method.getName().equals(setter)) {
-                                            String refBeanId = beanRefDependency.getValue();
-                                            method.invoke(bean.getValue(), getBean(refBeanId));
 
-                                        }
-                                    }
+    private String getSetterForField(String fieldName) {
+        return "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+    }
 
-                                }
-                            }
-                        }
-                    }
+    private Object getDependencyType(Class type, String beanDefinitionValue) {
+        if (type == Integer.class) {
+            return Integer.parseInt(beanDefinitionValue);
+        } else if (type == Double.class) {
+            return Double.parseDouble(beanDefinitionValue);
+        } else if (type == String.class) {
+            return beanDefinitionValue;
+        }
+        throw new RuntimeException( beanDefinitionValue + "type can not be converted to " + type);
+    }
 
-                }
-            }
+    private void injectValueDependency(String fieldName, Class<?> clazz, Object beanValue, String dependencyValue) {
+        try {
+            String setter = getSetterForField(fieldName);
+            Field field = clazz.getDeclaredField(fieldName);
+            Method method = clazz.getMethod(setter, field.getType());
+            method.invoke(beanValue, getDependencyType(field.getType(), dependencyValue));
+        } catch (Exception e) {
+            throw new RuntimeException("Can not get setter for field: " + fieldName, e);
         }
     }
+
 }
