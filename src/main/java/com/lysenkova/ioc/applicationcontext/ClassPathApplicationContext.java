@@ -17,9 +17,7 @@ public class ClassPathApplicationContext implements ApplicationContext {
     private List<Bean> beans;
     private List<BeanDefinition> beanDefinitions;
 
-    public ClassPathApplicationContext() {
-        setBeanDefinitionReader(reader);
-    }
+    public ClassPathApplicationContext() {}
 
     public ClassPathApplicationContext(String path) {
         this(new String[]{path});
@@ -29,7 +27,6 @@ public class ClassPathApplicationContext implements ApplicationContext {
         beans = new ArrayList<>();
         beanDefinitions = new ArrayList<>();
         reader = new XMLBeanDefinitionReader(paths);
-        setBeanDefinitionReader(reader);
         createBeansFromBeanDefinitions();
         injectDependencies();
         injectRefDependencies();
@@ -77,6 +74,7 @@ public class ClassPathApplicationContext implements ApplicationContext {
     @Override
     public void setBeanDefinitionReader(BeanDefinitionReader beanDefinitionReader) {
         this.reader = beanDefinitionReader;
+        startInitialization();
     }
 
     private void createBeansFromBeanDefinitions() {
@@ -168,6 +166,14 @@ public class ClassPathApplicationContext implements ApplicationContext {
             }
         }
         throw new RuntimeException("Could not find reference object for reference: " + refDependencyValue);
+    }
+
+    private void startInitialization() {
+        beans = new ArrayList<>();
+        beanDefinitions = new ArrayList<>();
+        createBeansFromBeanDefinitions();
+        injectDependencies();
+        injectRefDependencies();
     }
 
 }
