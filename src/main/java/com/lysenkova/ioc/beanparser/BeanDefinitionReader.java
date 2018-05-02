@@ -1,6 +1,6 @@
 package com.lysenkova.ioc.beanparser;
 
-import com.lysenkova.initbean.entity.BeanDefinition;
+import com.lysenkova.ioc.entity.BeanDefinition;
 
 import java.util.List;
 

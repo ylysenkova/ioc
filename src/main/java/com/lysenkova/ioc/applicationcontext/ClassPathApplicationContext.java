@@ -1,13 +1,11 @@
 package com.lysenkova.ioc.applicationcontext;
 
-import com.lysenkova.initbean.beanparser.BeanDefinitionReader;
-import com.lysenkova.initbean.beanparser.XMLBeanDefinitionReader;
-import com.lysenkova.initbean.entity.Bean;
-import com.lysenkova.initbean.entity.BeanDefinition;
-import com.lysenkova.initbean.exception.BeanInstantiationException;
+import com.lysenkova.ioc.beanparser.BeanDefinitionReader;
+import com.lysenkova.ioc.beanparser.XMLBeanDefinitionReader;
+import com.lysenkova.ioc.entity.Bean;
+import com.lysenkova.ioc.entity.BeanDefinition;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +28,7 @@ public class ClassPathApplicationContext implements ApplicationContext {
     public ClassPathApplicationContext(String[] paths) {
         beans = new ArrayList<>();
         beanDefinitions = new ArrayList<>();
+        reader = new XMLBeanDefinitionReader(paths);
         setBeanDefinitionReader(reader);
         createBeansFromBeanDefinitions();
         injectDependencies();
@@ -39,7 +38,7 @@ public class ClassPathApplicationContext implements ApplicationContext {
     @Override
     public <T> T getBean(Class<T> clazz) {
         for (Bean bean : beans) {
-            if (bean.getValue().equals(clazz)) {
+            if (bean.getValue().getClass() == clazz) {
                 return clazz.cast(bean.getValue());
             }
         }
@@ -80,22 +79,23 @@ public class ClassPathApplicationContext implements ApplicationContext {
         this.reader = beanDefinitionReader;
     }
 
-    private void createBeansFromBeanDefinitions() throws BeanInstantiationException {
+    private void createBeansFromBeanDefinitions() {
         beanDefinitions = reader.readBeanDefinitions();
         for (BeanDefinition beanDefinition : beanDefinitions) {
             try {
                 Bean bean = new Bean();
                 bean.setId(beanDefinition.getId());
-                bean.setValue(Class.forName(beanDefinition.getBeanClassName()).newInstance());
+                Object beanClass = Class.forName(beanDefinition.getBeanClassName()).newInstance();
+                bean.setValue(beanClass);
                 beans.add(bean);
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                throw new RuntimeException("Bean creation error.");
+            } catch (ClassNotFoundException| InstantiationException | IllegalAccessException e) {
+                throw new RuntimeException("Bean creation error.", e);
             }
         }
     }
 
 
-    private void injectDependencies() throws BeanInstantiationException {
+    private void injectDependencies() {
         for (BeanDefinition beanDefinition : beanDefinitions) {
             Object beanName = getBean(beanDefinition.getId());
             Class beanClass = beanName.getClass();
@@ -107,7 +107,7 @@ public class ClassPathApplicationContext implements ApplicationContext {
     }
 
 
-    private void injectRefDependencies() throws BeanInstantiationException {
+    private void injectRefDependencies() {
         for (BeanDefinition beanDefinition : beanDefinitions) {
             Object beanName = getBean(beanDefinition.getId());
             Class beanClass = beanName.getClass();
@@ -127,15 +127,15 @@ public class ClassPathApplicationContext implements ApplicationContext {
         return "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
     }
 
-    private Object getDependencyType(Class type, String beanDefinitionValue) throws BeanInstantiationException {
-        if (type == Integer.class) {
+    private Object getDependencyType(Class type, String beanDefinitionValue) {
+        if (type == Integer.TYPE) {
             return Integer.parseInt(beanDefinitionValue);
-        } else if (type == Double.class) {
+        } else if (type == Double.TYPE) {
             return Double.parseDouble(beanDefinitionValue);
         } else if (type == String.class) {
             return beanDefinitionValue;
         }
-        throw new RuntimeException(beanDefinitionValue + "type can not be converted to " + type);
+        throw new RuntimeException(beanDefinitionValue + " type can not be converted to " + type);
     }
 
     private void injectValueDependency(String fieldName, Class<?> clazz, Object beanValue, String dependencyValue) {
@@ -154,10 +154,20 @@ public class ClassPathApplicationContext implements ApplicationContext {
             String setter = getSetterForField(fieldName);
             Field field = clazz.getDeclaredField(fieldName);
             Method method = clazz.getMethod(setter, field.getType());
-            method.invoke(beanValue, refDependencyValue);
+            Object refDependencyObject = getRefBeanObject(refDependencyValue);
+            method.invoke(beanValue, refDependencyObject);
         } catch (Exception e) {
-            throw new RuntimeException("Reference dependency" + fieldName + "can not be inserted", e);
+            throw new RuntimeException("Reference dependency " + fieldName + " can not be inserted", e);
         }
+    }
+
+    private Object getRefBeanObject(String refDependencyValue) {
+        for (Bean bean : beans) {
+            if(bean.getId().equals(refDependencyValue)) {
+                return bean.getValue();
+            }
+        }
+        throw new RuntimeException("Could not find reference object for reference: " + refDependencyValue);
     }
 
 }

@@ -1,0 +1,13 @@
+<beans>
+    
+    <bean id="person" class="com.lysenkova.ioc.testentities.Person">
+        <property name="name" value="Yana" />
+        <property name="age" value="30" />
+        <property name="cat" ref="cat" />
+    </bean>
+
+    <bean id="cat" class="com.lysenkova.ioc.testentities.Cat">
+        <property name="name" value="Ragnar"/>
+    </bean>
+
+</beans>

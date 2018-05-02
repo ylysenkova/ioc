@@ -1,6 +1,6 @@
 package com.lysenkova.ioc.applicationcontext;
 
-import com.lysenkova.initbean.beanparser.BeanDefinitionReader;
+import com.lysenkova.ioc.beanparser.BeanDefinitionReader;
 
 import java.util.List;
 

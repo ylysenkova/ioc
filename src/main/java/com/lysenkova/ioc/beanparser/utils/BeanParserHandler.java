@@ -1,8 +1,7 @@
 package com.lysenkova.ioc.beanparser.utils;
 
-import com.lysenkova.initbean.entity.BeanDefinition;
+import com.lysenkova.ioc.entity.BeanDefinition;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.util.ArrayList;
@@ -11,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public class BeanParserHandler extends DefaultHandler {
-    private List<BeanDefinition> beanDefinitions;
+    private List<BeanDefinition> beanDefinitions = new ArrayList<>();
 
     public List<BeanDefinition> getBeanDefinitions() {
         return beanDefinitions;
@@ -21,7 +20,6 @@ public class BeanParserHandler extends DefaultHandler {
     public void startElement(String path, String localName, String qName, Attributes attributes) {
         if (qName.equalsIgnoreCase("bean")) {
             BeanDefinition beanDefinition = new BeanDefinition();
-            beanDefinitions = new ArrayList<>();
             Map<String, String> dependencies = new HashMap<>();
             Map<String, String> references = new HashMap<>();
 
