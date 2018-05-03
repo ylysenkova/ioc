@@ -4,6 +4,7 @@ import com.lysenkova.ioc.beanparser.BeanDefinitionReader;
 import com.lysenkova.ioc.beanparser.XMLBeanDefinitionReader;
 import com.lysenkova.ioc.entity.Bean;
 import com.lysenkova.ioc.entity.BeanDefinition;
+import com.lysenkova.ioc.exception.BeanInstantiationException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -77,7 +78,7 @@ public class ClassPathApplicationContext implements ApplicationContext {
         startInitialization();
     }
 
-    private void createBeansFromBeanDefinitions() {
+    private void createBeansFromBeanDefinitions() throws BeanInstantiationException {
         beanDefinitions = reader.readBeanDefinitions();
         for (BeanDefinition beanDefinition : beanDefinitions) {
             try {
@@ -125,7 +126,7 @@ public class ClassPathApplicationContext implements ApplicationContext {
         return "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
     }
 
-    private Object getDependencyType(Class type, String beanDefinitionValue) {
+    private Object getDependencyType(Class type, String beanDefinitionValue) throws BeanInstantiationException {
         if (type == Integer.TYPE) {
             return Integer.parseInt(beanDefinitionValue);
         } else if (type == Double.TYPE) {
@@ -136,7 +137,7 @@ public class ClassPathApplicationContext implements ApplicationContext {
         throw new RuntimeException(beanDefinitionValue + " type can not be converted to " + type);
     }
 
-    private void injectValueDependency(String fieldName, Class<?> clazz, Object beanValue, String dependencyValue) {
+    private void injectValueDependency(String fieldName, Class<?> clazz, Object beanValue, String dependencyValue) throws BeanInstantiationException {
         try {
             String setter = getSetterForField(fieldName);
             Field field = clazz.getDeclaredField(fieldName);
@@ -147,7 +148,7 @@ public class ClassPathApplicationContext implements ApplicationContext {
         }
     }
 
-    private void injectValueRefDependency(String fieldName, Class<?> clazz, Object beanValue, String refDependencyValue) {
+    private void injectValueRefDependency(String fieldName, Class<?> clazz, Object beanValue, String refDependencyValue) throws BeanInstantiationException {
         try {
             String setter = getSetterForField(fieldName);
             Field field = clazz.getDeclaredField(fieldName);
@@ -159,7 +160,7 @@ public class ClassPathApplicationContext implements ApplicationContext {
         }
     }
 
-    private Object getRefBeanObject(String refDependencyValue) {
+    private Object getRefBeanObject(String refDependencyValue) throws BeanInstantiationException {
         for (Bean bean : beans) {
             if(bean.getId().equals(refDependencyValue)) {
                 return bean.getValue();
