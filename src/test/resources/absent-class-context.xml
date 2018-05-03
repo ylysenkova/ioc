@@ -1,0 +1,7 @@
+<beans>
+
+    <bean id="userService" class="com.lysenkova.ioc.testentities.UserServiceImpl">
+        <property name="mailService" ref="mailService"/>
+    </bean>
+
+</beans>

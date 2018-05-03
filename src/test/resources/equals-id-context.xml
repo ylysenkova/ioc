@@ -1,0 +1,12 @@
+<beans>
+
+    <bean id="paymentService" class="com.lysenkova.ioc.testentities.PaymentService">
+        <property name="maxAmount" value="5000"/>
+        <property name="mailService" ref="mailService"/>
+    </bean>
+
+    <bean id="paymentService" class="com.lysenkova.ioc.testentities.PaymentService">
+        <property name="mailService" ref="mailService"/>
+    </bean>
+
+</beans>

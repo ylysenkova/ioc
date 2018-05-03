@@ -1,0 +1,8 @@
+<beans>
+
+    <bean id="mailService" class="com.lysenkova.ioc.testentities.MailService">
+        <property name="protocol" value="POP3" />
+        <property name="port" value="three" />
+    </bean>
+
+</beans>

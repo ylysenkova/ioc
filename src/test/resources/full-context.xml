@@ -1,0 +1,21 @@
+<beans>
+
+    <bean id="mailService" class="com.lysenkova.ioc.testentities.MailService">
+        <property name="protocol" value="SMTP" />
+        <property name="port" value="8080" />
+    </bean>
+
+    <bean id="userService" class="com.lysenkova.ioc.testentities.UserService">
+        <property name="mailService" ref="mailService"/>
+    </bean>
+
+    <bean id="paymentWithMaxService" class="com.lysenkova.ioc.testentities.PaymentService">
+        <property name="maxAmount" value="5000"/>
+        <property name="mailService" ref="mailService"/>
+    </bean>
+
+    <bean id="paymentService" class="com.lysenkova.ioc.testentities.PaymentService">
+        <property name="mailService" ref="mailService"/>
+    </bean>
+
+</beans>

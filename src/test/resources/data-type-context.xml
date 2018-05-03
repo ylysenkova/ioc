@@ -1,0 +1,29 @@
+<beans>
+
+    <bean id="allDataTypesStorage" class="com.lysenkova.ioc.testentities.AllDataTypesStorage">
+        <property name="intType" value="1"/>
+        <property name="integerType" value="1"/>
+        <property name="doubleType" value="1.11"/>
+        <property name="doubleBigType" value="1.11"/>
+        <property name="longType" value="111"/>
+        <property name="longBigType" value="111"/>
+        <property name="floatType" value="2.22"/>
+        <property name="floatBigType" value="2.22"/>
+        <property name="shortType" value="11"/>
+        <property name="shortBigType" value="11"/>
+        <property name="booleanType" value="true"/>
+        <property name="booleanBigType" value="true"/>
+        <property name="byteType" value="-128"/>
+        <property name="byteBigType" value="-128"/>
+        <property name="charType" value="c"/>
+        <property name="characterType" value="c"/>
+        <property name="stringType" value="string"/>
+        <property name="mailService" ref="mailService"/>
+    </bean>
+
+    <bean id="mailService" class="com.lysenkova.ioc.testentities.MailService">
+        <property name="protocol" value="POP3" />
+        <property name="port" value="3000" />
+    </bean>
+
+</beans>
