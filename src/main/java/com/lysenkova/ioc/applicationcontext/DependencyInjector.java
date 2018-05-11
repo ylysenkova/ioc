@@ -1,5 +1,6 @@
 package com.lysenkova.ioc.applicationcontext;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.lysenkova.ioc.entity.Bean;
 import com.lysenkova.ioc.entity.BeanDefinition;
 import com.lysenkova.ioc.exception.BeanInstantiationException;
@@ -18,11 +19,13 @@ public class DependencyInjector extends Injector {
     }
 
     @Override
+    @VisibleForTesting
     void inject(List<BeanDefinition> beanDefinitions, List<Bean> beans) {
         super.inject(beanDefinitions, beans);
     }
 
     @Override
+    @VisibleForTesting
     void injectValue(String fieldName, Class<?> clazz, Object beanValue, String dependencyValue, List<Bean> beans) {
         try {
             String setter = getSetterForField(fieldName);

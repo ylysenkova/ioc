@@ -1,5 +1,6 @@
 package com.lysenkova.ioc.applicationcontext;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.lysenkova.ioc.beanparser.BeanDefinitionReader;
 import com.lysenkova.ioc.beanparser.XMLBeanDefinitionReader;
 import com.lysenkova.ioc.entity.Bean;
@@ -75,7 +76,8 @@ public class ClassPathApplicationContext implements ApplicationContext {
         startInitialization();
     }
 
-    private void createBeansFromBeanDefinitions() {
+    @VisibleForTesting
+    void createBeansFromBeanDefinitions() {
         beanDefinitions = reader.readBeanDefinitions();
         for (BeanDefinition beanDefinition : beanDefinitions) {
             try {
