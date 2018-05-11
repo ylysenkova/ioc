@@ -1,6 +1,7 @@
 package com.lysenkova.ioc.entity;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class BeanDefinition {
     private String id;
@@ -48,6 +49,23 @@ public class BeanDefinition {
 
     public void setRefDependencies(Map<String, String> refDependencies) {
         this.refDependencies = refDependencies;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BeanDefinition)) return false;
+        BeanDefinition that = (BeanDefinition) o;
+        return Objects.equals(getId(), that.getId()) &&
+                Objects.equals(getBeanClassName(), that.getBeanClassName()) &&
+                Objects.equals(getDependencies(), that.getDependencies()) &&
+                Objects.equals(getRefDependencies(), that.getRefDependencies());
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(getId(), getBeanClassName(), getDependencies(), getRefDependencies());
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.lysenkova.ioc.testentities;
 
+import java.util.Objects;
+
 public class PaymentService {
     private MailService mailService;
     private int maxAmount;
@@ -28,4 +30,12 @@ public class PaymentService {
         mailService.sendEmail("to", "credit successful");
     }
 
+
+    @Override
+    public String toString() {
+        return "PaymentService{" +
+                "mailService=" + mailService +
+                ", maxAmount=" + maxAmount +
+                '}';
+    }
 }

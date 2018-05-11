@@ -1,10 +1,6 @@
-package com.lysenkova.ioc.testentities.providers
+package com.lysenkova.ioc.applicationcontext.itests.providers
 
 import com.lysenkova.ioc.entity.BeanDefinition
-import com.lysenkova.ioc.testentities.MailService
-import com.lysenkova.ioc.testentities.UserService
-import com.lysenkova.ioc.testentities.PaymentService
-
 import org.testng.annotations.DataProvider
 
 class BeanDefinitionDataProvider {
@@ -67,6 +63,7 @@ class BeanDefinitionDataProvider {
         beanDefinitions.add(beanDefinitionTwo)
 
         def beanPropertiesThree = new HashMap<>()
+        beanPropertiesThree.put("maxAmount", "5000")
         def beanRefDependenciesThree = new HashMap<>()
         beanRefDependenciesThree.put("mailService", "mailService")
         BeanDefinition beanDefinitionThree = new BeanDefinition(
@@ -74,7 +71,6 @@ class BeanDefinitionDataProvider {
         beanDefinitions.add(beanDefinitionThree)
 
         def beanPropertiesFour = new HashMap<>()
-        beanPropertiesFour.put("maxAmount", "5000")
         def beanRefPropertiesFour = new HashMap<>()
         beanRefPropertiesFour.put("mailService", "mailService")
         BeanDefinition beanDefinitionFour = new BeanDefinition(

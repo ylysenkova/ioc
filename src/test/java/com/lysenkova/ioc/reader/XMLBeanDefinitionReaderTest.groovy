@@ -2,7 +2,7 @@ package com.lysenkova.ioc.reader
 
 import com.lysenkova.ioc.beanparser.BeanDefinitionReader
 import com.lysenkova.ioc.beanparser.XMLBeanDefinitionReader
-import com.lysenkova.ioc.testentities.providers.BeanDefinitionDataProvider
+import com.lysenkova.ioc.applicationcontext.itests.providers.BeanDefinitionDataProvider
 import org.testng.annotations.Test
 
 import static org.testng.Assert.assertEquals

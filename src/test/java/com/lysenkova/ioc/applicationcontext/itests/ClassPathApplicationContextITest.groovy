@@ -1,10 +1,12 @@
-package com.lysenkova.ioc.applicationcontext
+package com.lysenkova.ioc.applicationcontext.itests
 
+import com.lysenkova.ioc.applicationcontext.ApplicationContext
+import com.lysenkova.ioc.applicationcontext.ClassPathApplicationContext
+import com.lysenkova.ioc.applicationcontext.itests.providers.BeanDefinitionDataProvider
 import com.lysenkova.ioc.beanparser.BeanDefinitionReader
 import com.lysenkova.ioc.beanparser.XMLBeanDefinitionReader
 import com.lysenkova.ioc.exception.BeanInstantiationException
 import com.lysenkova.ioc.testentities.AllDataTypesStorage
-import com.lysenkova.ioc.testentities.providers.BeanDefinitionDataProvider
 import com.lysenkova.ioc.testentities.MailService
 import com.lysenkova.ioc.testentities.PaymentService
 import com.lysenkova.ioc.testentities.UserServiceWithoutSetter
@@ -13,7 +15,7 @@ import org.testng.annotations.Test
 import static org.testng.Assert.*
 
 
-class IClassPathApplicationContextTest {
+class ClassPathApplicationContextITest {
 
     @Test
     void getBeanByClassName() {

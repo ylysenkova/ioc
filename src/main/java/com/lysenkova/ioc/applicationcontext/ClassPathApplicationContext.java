@@ -25,12 +25,8 @@ public class ClassPathApplicationContext implements ApplicationContext {
     }
 
     public ClassPathApplicationContext(String[] paths) {
-        beans = new ArrayList<>();
-        beanDefinitions = new ArrayList<>();
         reader = new XMLBeanDefinitionReader(paths);
-        createBeansFromBeanDefinitions();
-        injectDependencies();
-        injectRefDependencies();
+        startInitialization();
     }
 
     @Override
