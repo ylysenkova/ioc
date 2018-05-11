@@ -90,34 +90,6 @@ public class ClassPathApplicationContext implements ApplicationContext {
         }
     }
 
-
-    private void injectDependencies() {
-        for (BeanDefinition beanDefinition : beanDefinitions) {
-            Object beanName = getBean(beanDefinition.getId());
-            Class beanClass = beanName.getClass();
-            Map<String, String> dependencies = beanDefinition.getDependencies();
-            for (String fieldName : dependencies.keySet()) {
-                injectValueDependency(fieldName, beanClass, beanName, dependencies.get(fieldName));
-            }
-        }
-    }
-
-
-    private void injectRefDependencies() {
-        for (BeanDefinition beanDefinition : beanDefinitions) {
-            Object beanName = getBean(beanDefinition.getId());
-            Class beanClass = beanName.getClass();
-            Map<String, String> beanRefDependencies = beanDefinition.getRefDependencies();
-            if (beanRefDependencies == null) {
-                return;
-            } else {
-                for (String fieldName : beanRefDependencies.keySet()) {
-                    injectValueRefDependency(fieldName, beanClass, beanName, beanRefDependencies.get(fieldName));
-                }
-            }
-        }
-    }
-
     private List<Bean> validateBeanId(Bean bean) {
         if (beans.size() > 0) {
             for (Bean beanListElement : beans) {
@@ -128,65 +100,6 @@ public class ClassPathApplicationContext implements ApplicationContext {
         }
         beans.add(bean);
         return beans;
-    }
-
-    private String getSetterForField(String fieldName) {
-        return "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-    }
-
-    private Object getDependencyType(Class type, String beanDefinitionValue) {
-        if (type == Integer.TYPE || type == Integer.class) {
-            return Integer.parseInt(beanDefinitionValue);
-        } else if (type == Double.TYPE || type == Double.class) {
-            return Double.parseDouble(beanDefinitionValue);
-        } else if (type == Character.TYPE || type == Character.class) {
-            return beanDefinitionValue.charAt(0);
-        } else if (type == Byte.TYPE || type == Byte.class) {
-            return Byte.parseByte(beanDefinitionValue);
-        } else if (type == Boolean.TYPE || type == Boolean.class) {
-            return Boolean.parseBoolean(beanDefinitionValue);
-        } else if (type == Short.TYPE || type == Short.class) {
-            return Short.parseShort(beanDefinitionValue);
-        } else if (type == Long.TYPE || type == Long.class) {
-            return Long.parseLong(beanDefinitionValue);
-        } else if (type == Float.TYPE || type == Float.class) {
-            return Float.parseFloat(beanDefinitionValue);
-        } else if (type == String.class) {
-            return beanDefinitionValue;
-        }
-        throw new BeanInstantiationException(beanDefinitionValue + " type can not be converted to " + type);
-    }
-
-    private void injectValueDependency(String fieldName, Class<?> clazz, Object beanValue, String dependencyValue) {
-        try {
-            String setter = getSetterForField(fieldName);
-            Field field = clazz.getDeclaredField(fieldName);
-            Method method = clazz.getMethod(setter, field.getType());
-            method.invoke(beanValue, getDependencyType(field.getType(), dependencyValue));
-        } catch (Exception e) {
-            throw new BeanInstantiationException("Can not get setter for field: " + fieldName, e);
-        }
-    }
-
-    private void injectValueRefDependency(String fieldName, Class<?> clazz, Object beanValue, String refDependencyValue) {
-        try {
-            String setter = getSetterForField(fieldName);
-            Field field = clazz.getDeclaredField(fieldName);
-            Method method = clazz.getMethod(setter, field.getType());
-            Object refDependencyObject = getRefBeanObject(refDependencyValue);
-            method.invoke(beanValue, refDependencyObject);
-        } catch (Exception e) {
-            throw new BeanInstantiationException("Reference dependency " + fieldName + " can not be inserted", e);
-        }
-    }
-
-    private Object getRefBeanObject(String refDependencyValue) {
-        for (Bean bean : beans) {
-            if (bean.getId().equals(refDependencyValue)) {
-                return bean.getValue();
-            }
-        }
-        throw new BeanInstantiationException("Could not find reference object for reference: " + refDependencyValue);
     }
 
     private void validateBeanClass(List<Bean> beans, Class clazz) {
@@ -205,8 +118,8 @@ public class ClassPathApplicationContext implements ApplicationContext {
         beans = new ArrayList<>();
         beanDefinitions = new ArrayList<>();
         createBeansFromBeanDefinitions();
-        injectDependencies();
-        injectRefDependencies();
+        new DependencyInjector().inject(beanDefinitions, beans);
+        new RefDependencyInjector().inject(beanDefinitions, beans);
     }
 
 }
