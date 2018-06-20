@@ -4,7 +4,6 @@ import com.lysenkova.ioc.entity.Bean;
 import com.lysenkova.ioc.entity.BeanDefinition;
 import com.lysenkova.ioc.exception.BeanInstantiationException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 

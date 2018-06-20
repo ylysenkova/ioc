@@ -1,20 +1,23 @@
 package com.lysenkova.ioc.entity;
 
+
 import java.util.Map;
 import java.util.Objects;
 
 public class BeanDefinition {
     private String id;
     private String beanClassName;
+    private String initMethod;
     private Map<String, String> dependencies;
     private Map<String, String> refDependencies;
 
     public BeanDefinition() {
     }
 
-    public BeanDefinition(String id, String beanClassName, Map<String, String> dependencies, Map<String, String> refDependencies) {
+    public BeanDefinition(String id, String beanClassName, String initMethod, Map<String, String> dependencies, Map<String, String> refDependencies) {
         this.id = id;
         this.beanClassName = beanClassName;
+        this.initMethod = initMethod;
         this.dependencies = dependencies;
         this.refDependencies = refDependencies;
     }
@@ -33,6 +36,14 @@ public class BeanDefinition {
 
     public void setBeanClassName(String beanClassName) {
         this.beanClassName = beanClassName;
+    }
+
+    public String getInitMethod() {
+        return initMethod;
+    }
+
+    public void setInitMethod(String initMethod) {
+        this.initMethod = initMethod;
     }
 
     public Map<String, String> getDependencies() {
@@ -58,6 +69,7 @@ public class BeanDefinition {
         BeanDefinition that = (BeanDefinition) o;
         return Objects.equals(getId(), that.getId()) &&
                 Objects.equals(getBeanClassName(), that.getBeanClassName()) &&
+                Objects.equals(getInitMethod(), that.getInitMethod()) &&
                 Objects.equals(getDependencies(), that.getDependencies()) &&
                 Objects.equals(getRefDependencies(), that.getRefDependencies());
     }
@@ -65,7 +77,7 @@ public class BeanDefinition {
     @Override
     public int hashCode() {
 
-        return Objects.hash(getId(), getBeanClassName(), getDependencies(), getRefDependencies());
+        return Objects.hash(getId(), getBeanClassName(), getInitMethod(), getDependencies(), getRefDependencies());
     }
 
     @Override
@@ -73,6 +85,7 @@ public class BeanDefinition {
         return "BeanDefinition{" +
                 "id='" + id + '\'' +
                 ", beanClassName='" + beanClassName + '\'' +
+                ", initMethod='" + initMethod + '\'' +
                 ", dependencies=" + dependencies +
                 ", refDependencies=" + refDependencies +
                 '}';

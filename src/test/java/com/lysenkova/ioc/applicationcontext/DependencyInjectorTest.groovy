@@ -3,7 +3,6 @@ package com.lysenkova.ioc.applicationcontext
 import com.lysenkova.ioc.entity.Bean
 import com.lysenkova.ioc.entity.BeanDefinition
 import com.lysenkova.ioc.testentities.MailService
-import com.lysenkova.ioc.testentities.UserService
 
 class DependencyInjectorTest extends GroovyTestCase {
     void testGetDependencies() {

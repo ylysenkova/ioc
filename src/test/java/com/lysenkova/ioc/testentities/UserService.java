@@ -2,6 +2,7 @@ package com.lysenkova.ioc.testentities;
 
     public class UserService implements Runnable {
         private MailService mailService;
+        private int number;
 
         public UserService() {
         }
@@ -16,6 +17,18 @@ package com.lysenkova.ioc.testentities;
 
         private int getUserCount() {
             return (int) (Math.random()*1000);
+        }
+
+        public int getNumber() {
+            return number;
+        }
+
+        public void setNumber(int number) {
+            this.number = number;
+        }
+
+        public void init() {
+            setNumber(3);
         }
 
         @Override

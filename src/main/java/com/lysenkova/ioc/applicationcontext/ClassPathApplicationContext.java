@@ -2,20 +2,18 @@ package com.lysenkova.ioc.applicationcontext;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.lysenkova.ioc.beanparser.BeanDefinitionReader;
-import com.lysenkova.ioc.beanparser.XMLBeanDefinitionReader;
+import com.lysenkova.ioc.beanparser.xml.XMLBeanDefinitionReader;
 import com.lysenkova.ioc.entity.Bean;
 import com.lysenkova.ioc.entity.BeanDefinition;
 import com.lysenkova.ioc.exception.BeanInstantiationException;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ClassPathApplicationContext implements ApplicationContext {
     private BeanDefinitionReader reader;
     private List<Bean> beans;
+    private List<Bean> postProcessorBeans;
     private List<BeanDefinition> beanDefinitions;
 
     public ClassPathApplicationContext() {
@@ -86,6 +84,7 @@ public class ClassPathApplicationContext implements ApplicationContext {
                 Object beanClass = Class.forName(beanDefinition.getBeanClassName()).newInstance();
                 bean.setValue(beanClass);
                 beans = validateBeanId(bean);
+                postProcessorBeans = getPostProcessorBeans(bean);
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
                 throw new BeanInstantiationException("Bean creation error.", e);
             }
@@ -115,13 +114,24 @@ public class ClassPathApplicationContext implements ApplicationContext {
             throw new BeanInstantiationException("For " + clazz + " more than 1 bean initialized.");
         }
     }
+    private List<Bean> getPostProcessorBeans(Bean bean) {
+        if (bean.getValue() instanceof BeanPostProcessor) {
+            postProcessorBeans.add(bean);
+        }
+        return postProcessorBeans;
+    }
 
     private void startInitialization() {
         beans = new ArrayList<>();
+        postProcessorBeans = new ArrayList<>();
         beanDefinitions = new ArrayList<>();
         createBeansFromBeanDefinitions();
         new DependencyInjector().inject(beanDefinitions, beans);
         new RefDependencyInjector().inject(beanDefinitions, beans);
+        BeanPostProcessorInvoker beanPostProcessorInvoker = new BeanPostProcessorInvoker(postProcessorBeans);
+        beanPostProcessorInvoker.invokeBeforeMethod(beans);
+        beanPostProcessorInvoker.invokeInitMethod(beans, beanDefinitions);
+        beanPostProcessorInvoker.invokeAfterMethod(beans);
     }
 
 }

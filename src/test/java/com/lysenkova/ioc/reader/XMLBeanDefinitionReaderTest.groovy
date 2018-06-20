@@ -1,7 +1,7 @@
 package com.lysenkova.ioc.reader
 
 import com.lysenkova.ioc.beanparser.BeanDefinitionReader
-import com.lysenkova.ioc.beanparser.XMLBeanDefinitionReader
+import com.lysenkova.ioc.beanparser.xml.XMLBeanDefinitionReader
 import com.lysenkova.ioc.applicationcontext.itests.providers.BeanDefinitionDataProvider
 import org.testng.annotations.Test
 

@@ -1,4 +1,4 @@
-package com.lysenkova.ioc.beanparser.utils;
+package com.lysenkova.ioc.beanparser.xml;
 
 import com.lysenkova.ioc.entity.BeanDefinition;
 import org.xml.sax.Attributes;
@@ -28,6 +28,8 @@ public class BeanParserHandler extends DefaultHandler {
 
             String className = attributes.getValue("class");
             beanDefinition.setBeanClassName(className);
+            String initMethod = attributes.getValue("init-method");
+            beanDefinition.setInitMethod(initMethod);
             beanDefinition.setDependencies(dependencies);
             beanDefinition.setRefDependencies(references);
             beanDefinitions.add(beanDefinition);

@@ -4,7 +4,7 @@ import com.lysenkova.ioc.applicationcontext.ApplicationContext
 import com.lysenkova.ioc.applicationcontext.ClassPathApplicationContext
 import com.lysenkova.ioc.applicationcontext.itests.providers.BeanDefinitionDataProvider
 import com.lysenkova.ioc.beanparser.BeanDefinitionReader
-import com.lysenkova.ioc.beanparser.XMLBeanDefinitionReader
+import com.lysenkova.ioc.beanparser.xml.XMLBeanDefinitionReader
 import com.lysenkova.ioc.exception.BeanInstantiationException
 import com.lysenkova.ioc.testentities.AllDataTypesStorage
 import com.lysenkova.ioc.testentities.MailService
