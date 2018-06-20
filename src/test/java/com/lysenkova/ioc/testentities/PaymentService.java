@@ -1,6 +1,5 @@
 package com.lysenkova.ioc.testentities;
 
-import java.util.Objects;
 
 public class PaymentService {
     private MailService mailService;

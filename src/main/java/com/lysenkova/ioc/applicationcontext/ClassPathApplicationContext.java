@@ -15,6 +15,7 @@ public class ClassPathApplicationContext implements ApplicationContext {
     private List<Bean> beans;
     private List<Bean> postProcessorBeans;
     private List<BeanDefinition> beanDefinitions;
+    private List<BeanDefinition> factoryBeanDefinitions;
 
     public ClassPathApplicationContext() {
     }
@@ -69,25 +70,33 @@ public class ClassPathApplicationContext implements ApplicationContext {
     }
 
     @Override
+    public List<BeanDefinition> getBeanDefinitions() {
+        return beanDefinitions;
+    }
+
+    @Override
     public void setBeanDefinitionReader(BeanDefinitionReader beanDefinitionReader) {
         this.reader = beanDefinitionReader;
         startInitialization();
     }
 
+
     @VisibleForTesting
     void createBeansFromBeanDefinitions() {
         beanDefinitions = reader.readBeanDefinitions();
-        for (BeanDefinition beanDefinition : beanDefinitions) {
-            try {
+        try {
+            factoryBeanDefinitions = getFactoryPostProcessorBeanDefinition(beanDefinitions);
+            for (BeanDefinition beanDefinition : beanDefinitions) {
+                new BeanFactoryPostProcessorInvoker(this).invokePostProcessBeanFactoryMethod(beanDefinition, factoryBeanDefinitions);
                 Bean bean = new Bean();
                 bean.setId(beanDefinition.getId());
                 Object beanClass = Class.forName(beanDefinition.getBeanClassName()).newInstance();
                 bean.setValue(beanClass);
                 beans = validateBeanId(bean);
                 postProcessorBeans = getPostProcessorBeans(bean);
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                throw new BeanInstantiationException("Bean creation error.", e);
             }
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            throw new BeanInstantiationException("Bean creation error.", e);
         }
     }
 
@@ -114,6 +123,7 @@ public class ClassPathApplicationContext implements ApplicationContext {
             throw new BeanInstantiationException("For " + clazz + " more than 1 bean initialized.");
         }
     }
+
     private List<Bean> getPostProcessorBeans(Bean bean) {
         if (bean.getValue() instanceof BeanPostProcessor) {
             postProcessorBeans.add(bean);
@@ -121,10 +131,24 @@ public class ClassPathApplicationContext implements ApplicationContext {
         return postProcessorBeans;
     }
 
+    private List<BeanDefinition> getFactoryPostProcessorBeanDefinition(List<BeanDefinition> beanDefinitions) throws ClassNotFoundException {
+        for (BeanDefinition beanDefinition : beanDefinitions) {
+            Class clazz = Class.forName(beanDefinition.getBeanClassName());
+            Class[] interfaces = clazz.getInterfaces();
+            for (Class beanFactoryInterface : interfaces) {
+                if (beanFactoryInterface == BeanFactoryPostProcessor.class) {
+                    factoryBeanDefinitions.add(beanDefinition);
+                }
+            }
+        }
+        return factoryBeanDefinitions;
+    }
+
     private void startInitialization() {
         beans = new ArrayList<>();
         postProcessorBeans = new ArrayList<>();
         beanDefinitions = new ArrayList<>();
+        factoryBeanDefinitions = new ArrayList<>();
         createBeansFromBeanDefinitions();
         new DependencyInjector().inject(beanDefinitions, beans);
         new RefDependencyInjector().inject(beanDefinitions, beans);

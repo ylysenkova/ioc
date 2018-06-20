@@ -1,0 +1,9 @@
+<beans>
+
+    <bean id="paymentWithMaxService" class="com.lysenkova.ioc.testentities.PaymentService">
+        <property name="maxAmount" value="5000"/>
+    </bean>
+
+    <bean id="factory" class="com.lysenkova.ioc.testentities.BeanFactoryPostProcessorTestEntity"/>
+
+</beans>
