@@ -22,7 +22,7 @@ class BeanPostProcessorInvokerTest extends GroovyTestCase {
     void setUp() {
         userService = new UserService()
 
-        beans = new ArrayList<>()
+        beans = new ArrayList()
         bean = new Bean()
         bean.setId('bean')
         bean.setValue(userService)
