@@ -55,9 +55,8 @@ public class BeanPostProcessorInvoker {
 
     @VisibleForTesting
     Method getInitMethodFromBeanDefinition(Bean bean, BeanDefinition beanDefinition) throws NoSuchMethodException {
-        Class beanClazz = bean.getValue().getClass();
-        Method method = beanClazz.getMethod(beanDefinition.getInitMethod());
-        return method;
+        Class<?> beanClazz = bean.getValue().getClass();
+        return beanClazz.getMethod(beanDefinition.getInitMethod());
     }
 
 }
