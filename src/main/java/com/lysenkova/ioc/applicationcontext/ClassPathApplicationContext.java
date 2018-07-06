@@ -1,6 +1,8 @@
 package com.lysenkova.ioc.applicationcontext;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.lysenkova.ioc.applicationcontext.injector.DependencyInjector;
+import com.lysenkova.ioc.applicationcontext.injector.RefDependencyInjector;
 import com.lysenkova.ioc.beanparser.BeanDefinitionReader;
 import com.lysenkova.ioc.beanparser.xml.XMLBeanDefinitionReader;
 import com.lysenkova.ioc.entity.Bean;
@@ -86,30 +88,30 @@ public class ClassPathApplicationContext implements ApplicationContext {
         beanDefinitions = reader.readBeanDefinitions();
         try {
             factoryBeanDefinitions = getFactoryPostProcessorBeanDefinition(beanDefinitions);
+            new BeanFactoryPostProcessorInvoker(beanDefinitions, factoryBeanDefinitions).invokePostProcessBeanFactoryMethod();
             for (BeanDefinition beanDefinition : beanDefinitions) {
-                new BeanFactoryPostProcessorInvoker(this).invokePostProcessBeanFactoryMethod(beanDefinition, factoryBeanDefinitions);
                 Bean bean = new Bean();
                 bean.setId(beanDefinition.getId());
-                Object beanClass = Class.forName(beanDefinition.getBeanClassName()).newInstance();
-                bean.setValue(beanClass);
-                beans = validateBeanId(bean);
-                postProcessorBeans = getPostProcessorBeans(bean);
+                Object beanValue = Class.forName(beanDefinition.getBeanClassName()).newInstance();
+                bean.setValue(beanValue);
+                addBean(bean);
+                if (bean.getValue() instanceof BeanPostProcessor) {
+                    postProcessorBeans.add(bean);
+                }
             }
+            beans.removeAll(postProcessorBeans);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             throw new BeanInstantiationException("Bean creation error.", e);
         }
     }
 
-    private List<Bean> validateBeanId(Bean bean) {
-        if (beans.size() > 0) {
-            for (Bean beanListElement : beans) {
-                if (beanListElement.getId().equals(bean.getId())) {
-                    throw new BeanInstantiationException("Bean with id: " + beanListElement.getId() + " has already been initialized.");
-                }
+    private void addBean(Bean bean) {
+        for (Bean beanElement : beans) {
+            if(beanElement.getId().equals(bean.getId())) {
+                throw new BeanInstantiationException("Bean with id: " + beanElement.getId() + " has already been initialized.");
             }
         }
         beans.add(bean);
-        return beans;
     }
 
     private void validateBeanClass(List<Bean> beans, Class clazz) {
@@ -124,23 +126,14 @@ public class ClassPathApplicationContext implements ApplicationContext {
         }
     }
 
-    private List<Bean> getPostProcessorBeans(Bean bean) {
-        if (bean.getValue() instanceof BeanPostProcessor) {
-            postProcessorBeans.add(bean);
-        }
-        return postProcessorBeans;
-    }
-
     private List<BeanDefinition> getFactoryPostProcessorBeanDefinition(List<BeanDefinition> beanDefinitions) throws ClassNotFoundException {
         for (BeanDefinition beanDefinition : beanDefinitions) {
             Class clazz = Class.forName(beanDefinition.getBeanClassName());
-            Class[] interfaces = clazz.getInterfaces();
-            for (Class beanFactoryInterface : interfaces) {
-                if (beanFactoryInterface == BeanFactoryPostProcessor.class) {
-                    factoryBeanDefinitions.add(beanDefinition);
-                }
+            if (BeanFactoryPostProcessor.class.isAssignableFrom(clazz)) {
+                factoryBeanDefinitions.add(beanDefinition);
             }
         }
+        beanDefinitions.removeAll(factoryBeanDefinitions);
         return factoryBeanDefinitions;
     }
 

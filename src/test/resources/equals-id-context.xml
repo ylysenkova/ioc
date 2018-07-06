@@ -5,7 +5,7 @@
         <property name="mailService" ref="mailService"/>
     </bean>
 
-    <bean id="paymentService" class="com.lysenkova.ioc.testentities.PaymentService">
+    <bean id="paymentService" class="com.lysenkova.ioc.testentities.UserService">
         <property name="mailService" ref="mailService"/>
     </bean>
 

@@ -63,7 +63,7 @@ class ClassPathApplicationContextITest {
     void getBeanNames(List<String> expectedBeanNames) {
         ApplicationContext applicationContext = new ClassPathApplicationContext("email-context.xml", "context.xml")
         def actualBeanNames = applicationContext.getBeanNames()
-        assertEquals(actualBeanNames, expectedBeanNames)
+        assertTrue(actualBeanNames.containsAll(expectedBeanNames))
     }
 
     @Test(dataProvider = "provideBeanNames", dataProviderClass = BeanDefinitionDataProvider.class)
@@ -72,7 +72,8 @@ class ClassPathApplicationContextITest {
         ApplicationContext applicationContext = new ClassPathApplicationContext()
         applicationContext.setBeanDefinitionReader(reader)
         def actualBeanNames = applicationContext.getBeanNames()
-        assertEquals(actualBeanNames, expectedBeanNames)
+        assertEquals(actualBeanNames.size(), expectedBeanNames.size())
+        assertTrue(actualBeanNames.containsAll(expectedBeanNames))
     }
 
     @Test(expectedExceptionsMessageRegExp = "Reference dependency mailService can not be inserted", expectedExceptions = BeanInstantiationException.class)
@@ -89,7 +90,7 @@ class ClassPathApplicationContextITest {
 
     @Test(expectedExceptionsMessageRegExp = "Bean with id: paymentService has already been initialized.", expectedExceptions = BeanInstantiationException.class)
     void getBeanWithTheSameId() {
-        ApplicationContext applicationContext = new ClassPathApplicationContext("equals-id-context.xml")
+        ApplicationContext applicationContext = new ClassPathApplicationContext("email-context.xml", "equals-id-context.xml")
         applicationContext.getBean(PaymentService.class)
     }
 

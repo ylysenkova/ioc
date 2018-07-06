@@ -7,6 +7,7 @@ import com.lysenkova.ioc.exception.BeanInstantiationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,9 +16,13 @@ public class XMLBeanDefinitionReader implements BeanDefinitionReader {
     private List<BeanDefinition> beanDefinitions = new ArrayList<>();
 
     public XMLBeanDefinitionReader(String[] paths) {
+        ClassLoader classLoader = getClass().getClassLoader();
         for (int i = 0; i < paths.length; i++) {
-            ClassLoader classLoader = getClass().getClassLoader();
-            File file = new File(classLoader.getResource(paths[i]).getFile());
+            URL resource = classLoader.getResource(paths[i]);
+            if (resource == null) {
+                throw new RuntimeException("Can not find file.");
+            }
+            File file = new File(resource.getFile());
             paths[i] = file.getAbsolutePath();
         }
         this.paths = paths;

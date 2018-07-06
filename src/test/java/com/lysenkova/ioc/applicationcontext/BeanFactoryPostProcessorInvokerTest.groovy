@@ -12,9 +12,9 @@ class BeanFactoryPostProcessorInvokerTest extends GroovyTestCase {
         factoryBeanDefinition.setBeanClassName('com.lysenkova.ioc.testentities.BeanFactoryPostProcessorTestEntity')
         factoryBeanDefinitions.add(factoryBeanDefinition)
         def beanDefinitions = context.getBeanDefinitions()
-        BeanFactoryPostProcessorInvoker invoker = new BeanFactoryPostProcessorInvoker(context)
+        BeanFactoryPostProcessorInvoker invoker = new BeanFactoryPostProcessorInvoker(beanDefinitions, factoryBeanDefinitions)
         for(beanDefinition in beanDefinitions){
-            invoker.invokePostProcessBeanFactoryMethod(beanDefinition, factoryBeanDefinitions)
+            invoker.invokePostProcessBeanFactoryMethod()
         }
 
         def expected = "1000"

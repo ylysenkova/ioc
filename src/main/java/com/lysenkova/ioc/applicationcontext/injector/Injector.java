@@ -1,4 +1,4 @@
-package com.lysenkova.ioc.applicationcontext;
+package com.lysenkova.ioc.applicationcontext.injector;
 
 import com.lysenkova.ioc.entity.Bean;
 import com.lysenkova.ioc.entity.BeanDefinition;

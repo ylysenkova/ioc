@@ -1,4 +1,4 @@
-package com.lysenkova.ioc.applicationcontext;
+package com.lysenkova.ioc.applicationcontext.injector;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.lysenkova.ioc.entity.Bean;
@@ -19,8 +19,7 @@ public class DependencyInjector extends Injector {
     }
 
     @Override
-    @VisibleForTesting
-    void inject(List<BeanDefinition> beanDefinitions, List<Bean> beans) {
+    public void inject(List<BeanDefinition> beanDefinitions, List<Bean> beans) {
         super.inject(beanDefinitions, beans);
     }
 
