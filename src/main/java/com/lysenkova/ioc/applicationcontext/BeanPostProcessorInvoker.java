@@ -12,20 +12,23 @@ import java.util.stream.Collectors;
 
 public class BeanPostProcessorInvoker {
     private List<Bean> postProcessorBeans;
+    private List<Bean> beans;
 
-    public BeanPostProcessorInvoker(List<Bean> postProcessorBeans) {
+    public BeanPostProcessorInvoker(List<Bean> postProcessorBeans, List<Bean> beans) {
         this.postProcessorBeans = postProcessorBeans;
+        this.beans = beans;
     }
 
-    public void invokeBeforeMethod(List<Bean> beans) {
+    public List<Bean> invokeBeforeMethod() {
         for (Bean postProcessorBean : postProcessorBeans) {
             beans = beans.stream().peek(bean -> ((BeanPostProcessor) postProcessorBean.getValue())
                     .postProcessBeforeInitialization(bean, bean.getId()))
                     .collect(Collectors.toList());
         }
+        return beans;
     }
 
-    public void invokeInitMethod(List<Bean> beans, List<BeanDefinition> beanDefinitions) {
+    public void invokeInitMethod(List<BeanDefinition> beanDefinitions) {
         try {
             for (BeanDefinition beanDefinition : beanDefinitions) {
                 for (Bean bean : beans) {
@@ -44,13 +47,14 @@ public class BeanPostProcessorInvoker {
 
     }
 
-    public void invokeAfterMethod(List<Bean> beans) {
+    public List<Bean> invokeAfterMethod() {
         for (Bean postProcessorBean : postProcessorBeans) {
             beans = beans.stream()
                     .peek(bean -> ((BeanPostProcessor) postProcessorBean.getValue())
                             .postProcessAfterInitialization(bean, bean.getId()))
                     .collect(Collectors.toList());
         }
+        return beans;
     }
 
     @VisibleForTesting

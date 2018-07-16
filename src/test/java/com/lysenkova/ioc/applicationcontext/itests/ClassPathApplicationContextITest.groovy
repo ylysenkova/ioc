@@ -8,6 +8,7 @@ import com.lysenkova.ioc.beanparser.xml.XMLBeanDefinitionReader
 import com.lysenkova.ioc.exception.BeanInstantiationException
 import com.lysenkova.ioc.testentities.AllDataTypesStorage
 import com.lysenkova.ioc.testentities.MailService
+import com.lysenkova.ioc.testentities.MailServiceImpl
 import com.lysenkova.ioc.testentities.PaymentService
 import com.lysenkova.ioc.testentities.UserServiceWithoutSetter
 import org.testng.annotations.Test
@@ -48,7 +49,7 @@ class ClassPathApplicationContextITest {
     @Test
     void getBeanById() {
         ApplicationContext applicationContext = new ClassPathApplicationContext("email-context.xml")
-        MailService mailService = applicationContext.getBean("mailService")
+        MailServiceImpl mailService = applicationContext.getBean("mailService")
 
         String expectedProtocol = "POP3"
         String actualProtocol = mailService.getProtocol()

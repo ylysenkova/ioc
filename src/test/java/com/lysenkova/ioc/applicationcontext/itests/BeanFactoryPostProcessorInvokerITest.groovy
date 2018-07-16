@@ -1,8 +1,14 @@
-package com.lysenkova.ioc.applicationcontext
+package com.lysenkova.ioc.applicationcontext.itests
 
+import com.lysenkova.ioc.applicationcontext.ApplicationContext
+import com.lysenkova.ioc.applicationcontext.BeanFactoryPostProcessorInvoker
+import com.lysenkova.ioc.applicationcontext.ClassPathApplicationContext
 import com.lysenkova.ioc.entity.BeanDefinition
+import org.junit.Test
 
-class BeanFactoryPostProcessorInvokerTest extends GroovyTestCase {
+class BeanFactoryPostProcessorInvokerITest {
+
+    @Test
     void testInvokePostProcessBeanFactoryMethod() {
 
         ApplicationContext context = new ClassPathApplicationContext("payment-context.xml")
@@ -13,12 +19,12 @@ class BeanFactoryPostProcessorInvokerTest extends GroovyTestCase {
         factoryBeanDefinitions.add(factoryBeanDefinition)
         def beanDefinitions = context.getBeanDefinitions()
         BeanFactoryPostProcessorInvoker invoker = new BeanFactoryPostProcessorInvoker(beanDefinitions, factoryBeanDefinitions)
-        for(beanDefinition in beanDefinitions){
+        for (beanDefinition in beanDefinitions) {
             invoker.invokePostProcessBeanFactoryMethod()
         }
 
         def expected = "1000"
         def actual = beanDefinitions.get(0).getDependencies().get('maxAmount')
-        assertEquals(expected, actual)
+        assert expected == actual
     }
 }

@@ -21,7 +21,7 @@
         <property name="mailService" ref="mailService"/>
     </bean>
 
-    <bean id="mailService" class="com.lysenkova.ioc.testentities.MailService">
+    <bean id="mailService" class="com.lysenkova.ioc.testentities.MailServiceImpl">
         <property name="protocol" value="POP3" />
         <property name="port" value="3000" />
     </bean>

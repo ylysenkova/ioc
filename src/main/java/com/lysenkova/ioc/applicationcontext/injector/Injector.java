@@ -4,11 +4,13 @@ import com.lysenkova.ioc.entity.Bean;
 import com.lysenkova.ioc.entity.BeanDefinition;
 import com.lysenkova.ioc.exception.BeanInstantiationException;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
 abstract class Injector {
-       abstract void injectValue(String fieldName, Class<?> clazz, Object beanValue, String dependencyValue, List<Bean> beans);
+       abstract void injectValue(Field field, Class<?> clazz, Object beanValue, String dependencyValue, List<Bean> beans, String setter);
 
     abstract Map<String, String> getDependencies(BeanDefinition beanDefinition);
 
@@ -18,7 +20,14 @@ abstract class Injector {
             Class beanClass = beanName.getClass();
             Map<String, String> dependencies = getDependencies(beanDef);
             for (String fieldName : dependencies.keySet()) {
-                injectValue(fieldName, beanClass, beanName, dependencies.get(fieldName), beans);
+                String setter = getSetterForField(fieldName);
+                Field field;
+                try {
+                    field = beanClass.getDeclaredField(fieldName);
+                }catch (NoSuchFieldException e) {
+                    throw new BeanInstantiationException("There is no field: " + fieldName, e);
+                }
+                injectValue(field, beanClass, beanName, dependencies.get(fieldName), beans, setter);
             }
         }
     }

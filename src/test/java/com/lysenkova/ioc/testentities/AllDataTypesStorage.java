@@ -20,7 +20,7 @@ public class AllDataTypesStorage {
     private Character characterType;
     private String stringType;
 
-    private MailService mailService;
+    private MailServiceImpl mailService;
 
     public int getIntType() {
         return intType;
@@ -158,11 +158,11 @@ public class AllDataTypesStorage {
         this.stringType = stringType;
     }
 
-    public MailService getMailService() {
+    public MailServiceImpl getMailService() {
         return mailService;
     }
 
-    public void setMailService(MailService mailService) {
+    public void setMailService(MailServiceImpl mailService) {
         this.mailService = mailService;
     }
 }

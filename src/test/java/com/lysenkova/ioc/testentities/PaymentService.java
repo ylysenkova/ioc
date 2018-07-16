@@ -2,17 +2,17 @@ package com.lysenkova.ioc.testentities;
 
 
 public class PaymentService {
-    private MailService mailService;
+    private MailServiceImpl mailService;
     private int maxAmount;
 
     public PaymentService() {
     }
 
-    public MailService getMailService() {
+    public MailServiceImpl getMailService() {
         return mailService;
     }
 
-    public void setMailService(MailService mailService) {
+    public void setMailService(MailServiceImpl mailService) {
         this.mailService = mailService;
     }
 

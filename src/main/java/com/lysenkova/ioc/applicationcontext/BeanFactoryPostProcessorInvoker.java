@@ -16,7 +16,7 @@ public class BeanFactoryPostProcessorInvoker {
 
     public void invokePostProcessBeanFactoryMethod() {
         List<BeanFactoryPostProcessor> factories = createFactoryBeans();
-            if (factories != null) {
+        if (factories != null) {
             for (BeanFactoryPostProcessor factory : factories) {
                 factory.postProcessBeanFactory(beanDefinitions);
             }

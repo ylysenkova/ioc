@@ -13,7 +13,7 @@ class BeanDefinitionDataProvider {
         beanPropertiesOne.put('port', '8080')
         def beanRefDependenciesOne = new HashMap()
         BeanDefinition beanDefinitionOne = new BeanDefinition(
-                id: 'mailService', beanClassName: 'com.lysenkova.ioc.testentities.MailService', dependencies: beanPropertiesOne, refDependencies: beanRefDependenciesOne)
+                id: 'mailService', beanClassName: 'com.lysenkova.ioc.testentities.MailServiceImpl', dependencies: beanPropertiesOne, refDependencies: beanRefDependenciesOne)
         beanDefinitions.add(beanDefinitionOne)
 
         def beanPropertiesTwo = new HashMap()
@@ -52,7 +52,7 @@ class BeanDefinitionDataProvider {
         beanPropertiesOne.put("port", "8080")
         def beanRefDependenciesOne = new HashMap()
         BeanDefinition beanDefinitionOne = new BeanDefinition(
-                id: 'mailService', beanClassName: 'com.lysenkova.ioc.testentities.MailService', dependencies: beanPropertiesOne, refDependencies: beanRefDependenciesOne)
+                id: 'mailService', beanClassName: 'com.lysenkova.ioc.testentities.MailServiceImpl', dependencies: beanPropertiesOne, refDependencies: beanRefDependenciesOne)
         beanDefinitions.add(beanDefinitionOne)
 
         def beanPropertiesTwo = new HashMap()
@@ -82,7 +82,7 @@ class BeanDefinitionDataProvider {
         beanPropertiesFive.put("port", "3000")
         def beanRefDependenciesFive = new HashMap()
         BeanDefinition beanDefinitionFive = new BeanDefinition(
-                id: 'mailService', beanClassName: 'com.lysenkova.ioc.testentities.MailService', dependencies: beanPropertiesFive, refDependencies: beanRefDependenciesFive)
+                id: 'mailService', beanClassName: 'com.lysenkova.ioc.testentities.MailServiceImpl', dependencies: beanPropertiesFive, refDependencies: beanRefDependenciesFive)
         beanDefinitions.add(beanDefinitionFive)
 
         def array = new Object[1][]

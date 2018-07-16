@@ -1,12 +1,12 @@
 package com.lysenkova.ioc.testentities;
 
 public class UserServiceWithoutSetter {
-    private MailService mailService;
+    private MailServiceImpl mailService;
 
     public UserServiceWithoutSetter() {
     }
 
-    public MailService getMailService() {
+    public MailServiceImpl getMailService() {
         return mailService;
     }
 }

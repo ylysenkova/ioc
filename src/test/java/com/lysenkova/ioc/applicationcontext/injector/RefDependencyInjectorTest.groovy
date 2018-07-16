@@ -2,8 +2,10 @@ package com.lysenkova.ioc.applicationcontext.injector
 
 import com.lysenkova.ioc.entity.Bean
 import com.lysenkova.ioc.entity.BeanDefinition
-import com.lysenkova.ioc.testentities.MailService
+import com.lysenkova.ioc.testentities.MailServiceImpl
 import com.lysenkova.ioc.testentities.UserService
+
+import java.lang.reflect.Field
 
 class RefDependencyInjectorTest extends GroovyTestCase {
     void testGetDependencies() {
@@ -22,7 +24,7 @@ class RefDependencyInjectorTest extends GroovyTestCase {
         Injector injector = new RefDependencyInjector()
 
         UserService userService = new UserService()
-        MailService mailService = new MailService()
+        MailServiceImpl mailService = new MailServiceImpl()
         mailService.setPort(8080)
         mailService.setProtocol('DDL')
         Bean userBean = new Bean()
@@ -55,7 +57,7 @@ class RefDependencyInjectorTest extends GroovyTestCase {
         Injector injector = new RefDependencyInjector()
 
         UserService userService = new UserService()
-        MailService mailService = new MailService()
+        MailServiceImpl mailService = new MailServiceImpl()
         mailService.setPort(8080)
         mailService.setProtocol('DDL')
         Bean userBean = new Bean()
@@ -67,8 +69,10 @@ class RefDependencyInjectorTest extends GroovyTestCase {
         def beans = new ArrayList()
         beans.add(userBean)
         beans.add(mailBean)
+        def setMailService = injector.getSetterForField('mailService')
+        Field field = userService.getClass().getDeclaredField('mailService')
 
-        injector.injectValue('mailService', UserService.class, userBean.getValue(), mailBean.getId(), beans)
+        injector.injectValue(field, UserService.class, userBean.getValue(), mailBean.getId(), beans, setMailService)
         def expected = mailService
         def actual = userService.getMailService()
         assertEquals(expected, actual)

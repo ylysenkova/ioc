@@ -15,7 +15,7 @@ public class DependencyInjector extends Injector {
 
     @Override
     Map<String, String> getDependencies(BeanDefinition beanDefinition) {
-        return  beanDefinition.getDependencies();
+        return beanDefinition.getDependencies();
     }
 
     @Override
@@ -25,14 +25,12 @@ public class DependencyInjector extends Injector {
 
     @Override
     @VisibleForTesting
-    void injectValue(String fieldName, Class<?> clazz, Object beanValue, String dependencyValue, List<Bean> beans) {
+    void injectValue(Field field, Class<?> clazz, Object beanValue, String dependencyValue, List<Bean> beans, String setter) {
         try {
-            String setter = getSetterForField(fieldName);
-            Field field = clazz.getDeclaredField(fieldName);
             Method method = clazz.getMethod(setter, field.getType());
             method.invoke(beanValue, getDependencyType(field.getType(), dependencyValue));
         } catch (Exception e) {
-            throw new BeanInstantiationException("Can not get setter for field: " + fieldName, e);
+            throw new BeanInstantiationException("Can not get setter for field: " + field.getName(), e);
         }
     }
 

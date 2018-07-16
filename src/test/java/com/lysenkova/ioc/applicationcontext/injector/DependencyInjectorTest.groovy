@@ -2,7 +2,9 @@ package com.lysenkova.ioc.applicationcontext.injector
 
 import com.lysenkova.ioc.entity.Bean
 import com.lysenkova.ioc.entity.BeanDefinition
-import com.lysenkova.ioc.testentities.MailService
+import com.lysenkova.ioc.testentities.MailServiceImpl
+
+import java.lang.reflect.Field
 
 class DependencyInjectorTest extends GroovyTestCase {
     void testGetDependencies() {
@@ -22,7 +24,7 @@ class DependencyInjectorTest extends GroovyTestCase {
     void testInject() {
         Injector injector = new DependencyInjector()
 
-        MailService mailService = new MailService()
+        MailServiceImpl mailService = new MailServiceImpl()
         mailService.setPort(8080)
         mailService.setProtocol('DDL')
         Bean mailBean = new Bean()
@@ -54,7 +56,7 @@ class DependencyInjectorTest extends GroovyTestCase {
     void testInjectValue() {
         Injector injector = new DependencyInjector()
 
-        MailService mailService = new MailService()
+        MailServiceImpl mailService = new MailServiceImpl()
         mailService.setPort(8080)
         mailService.setProtocol('DDL')
         Bean mailBean = new Bean()
@@ -62,9 +64,13 @@ class DependencyInjectorTest extends GroovyTestCase {
         mailBean.setValue(mailService)
         def beans = new ArrayList()
         beans.add(mailBean)
+        def setPort = injector.getSetterForField('port')
+        def setProtocol = injector.getSetterForField('protocol')
+        Field port = mailService.getClass().getDeclaredField('port')
+        Field protocol = mailService.getClass().getDeclaredField('protocol')
 
-        injector.injectValue('port', MailService.class, mailBean.getValue(), '8080', beans)
-        injector.injectValue('protocol', MailService.class, mailBean.getValue(), 'DDL', beans)
+        injector.injectValue(port, MailServiceImpl.class, mailBean.getValue(), '8080', beans, setPort)
+        injector.injectValue(protocol, MailServiceImpl.class, mailBean.getValue(), 'DDL', beans, setProtocol)
         def expectedPort = 8080
         def actualPort = mailService.getPort()
         assertEquals(expectedPort, actualPort)

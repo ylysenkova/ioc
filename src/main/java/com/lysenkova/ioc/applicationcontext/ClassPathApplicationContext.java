@@ -35,7 +35,7 @@ public class ClassPathApplicationContext implements ApplicationContext {
     public <T> T getBean(Class<T> clazz) {
         validateBeanClass(beans, clazz);
         for (Bean bean : beans) {
-            if (bean.getValue().getClass() == clazz) {
+            if (clazz.isAssignableFrom(bean.getValue().getClass())) {
                 return clazz.cast(bean.getValue());
             }
         }
@@ -107,7 +107,7 @@ public class ClassPathApplicationContext implements ApplicationContext {
 
     private void addBean(Bean bean) {
         for (Bean beanElement : beans) {
-            if(beanElement.getId().equals(bean.getId())) {
+            if (beanElement.getId().equals(bean.getId())) {
                 throw new BeanInstantiationException("Bean with id: " + beanElement.getId() + " has already been initialized.");
             }
         }
@@ -142,13 +142,15 @@ public class ClassPathApplicationContext implements ApplicationContext {
         postProcessorBeans = new ArrayList<>();
         beanDefinitions = new ArrayList<>();
         factoryBeanDefinitions = new ArrayList<>();
+
         createBeansFromBeanDefinitions();
         new DependencyInjector().inject(beanDefinitions, beans);
         new RefDependencyInjector().inject(beanDefinitions, beans);
-        BeanPostProcessorInvoker beanPostProcessorInvoker = new BeanPostProcessorInvoker(postProcessorBeans);
-        beanPostProcessorInvoker.invokeBeforeMethod(beans);
-        beanPostProcessorInvoker.invokeInitMethod(beans, beanDefinitions);
-        beanPostProcessorInvoker.invokeAfterMethod(beans);
+        
+        BeanPostProcessorInvoker beanPostProcessorInvoker = new BeanPostProcessorInvoker(postProcessorBeans, beans);
+        beanPostProcessorInvoker.invokeBeforeMethod();
+        beanPostProcessorInvoker.invokeInitMethod(beanDefinitions);
+        beanPostProcessorInvoker.invokeAfterMethod();
     }
 
 }

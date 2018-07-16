@@ -19,21 +19,19 @@ public class RefDependencyInjector extends Injector {
     }
 
     @Override
-    public void inject(List<BeanDefinition> beanDefinitions,  List<Bean> beans) {
+    public void inject(List<BeanDefinition> beanDefinitions, List<Bean> beans) {
         super.inject(beanDefinitions, beans);
     }
 
     @Override
     @VisibleForTesting
-    void injectValue(String fieldName, Class<?> clazz, Object beanValue, String refDependencyValue, List<Bean> beans) {
+    void injectValue(Field field, Class<?> clazz, Object beanValue, String refDependencyValue, List<Bean> beans, String setter) {
         try {
-            String setter = getSetterForField(fieldName);
-            Field field = clazz.getDeclaredField(fieldName);
             Method method = clazz.getMethod(setter, field.getType());
             Object refDependencyObject = getRefBeanObject(refDependencyValue, beans);
             method.invoke(beanValue, refDependencyObject);
         } catch (Exception e) {
-            throw new BeanInstantiationException("Reference dependency " + fieldName + " can not be inserted", e);
+            throw new BeanInstantiationException("Reference dependency " + field.getName() + " can not be inserted", e);
         }
     }
 

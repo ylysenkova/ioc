@@ -5,9 +5,11 @@ import com.lysenkova.ioc.entity.BeanDefinition
 import com.lysenkova.ioc.testentities.BeanPostProcessorTestEntity
 import com.lysenkova.ioc.testentities.PaymentService
 import com.lysenkova.ioc.testentities.UserService
+import org.junit.Before
+import org.junit.Test
 
 
-class BeanPostProcessorInvokerTest extends GroovyTestCase {
+class BeanPostProcessorInvokerTest {
     UserService userService
     PaymentService paymentService
     List<Bean> beans
@@ -19,6 +21,7 @@ class BeanPostProcessorInvokerTest extends GroovyTestCase {
     BeanDefinition beanDefinition
     BeanDefinition beanDefinition1
 
+    @Before
     void setUp() {
         userService = new UserService()
 
@@ -55,59 +58,65 @@ class BeanPostProcessorInvokerTest extends GroovyTestCase {
         beanDefinitions.add(beanDefinition)
     }
 
-    void testInvokeBeforeMethod() {
+    @Test
+    void "Invoke before method"() {
         BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans)
         beanPostProcessBeans.add(postProcessBean)
         invoker.invokeBeforeMethod(beans)
         def actual = bean.getId()
         def expected = 'changedBean'
-        assertEquals(expected, actual)
+        assert expected == actual
         assert bean1.getId() == 'bean1'
     }
 
+    @Test
     void testInvokeBeforeMethodNeg() {
         def beanPostProcessBeans = new ArrayList()
         BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans)
         invoker.invokeBeforeMethod(beans)
         def actual = bean.getId()
         def expected = 'bean'
-        assertEquals(expected, actual)
+        assert expected == actual
         assert bean1.getId() == 'bean1'
     }
 
+    @Test
     void testInvokeInitMethod() {
         BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans)
         invoker.invokeInitMethod(beans, beanDefinitions)
         def actual = userService.getNumber()
         def expected = 3
-        assertEquals(expected, actual)
+        assert expected == actual
     }
 
+    @Test
     void testInvokeAfterMethod() {
         BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans)
         invoker.invokeAfterMethod(beans)
         def actual = bean.getId()
         def expected = 'changedBean'
-        assertEquals(expected, actual)
-        assert  bean1.getId() == 'bean1'
+        assert expected == actual
+        assert bean1.getId() == 'bean1'
     }
 
+    @Test
     void testInvokeAfterMethodNeg() {
         def beanPostProcessBeans = new ArrayList()
         BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans)
         invoker.invokeAfterMethod(beans)
         def actual = bean.getId()
         def expected = 'bean'
-        assertEquals(expected, actual)
+        assert expected == actual
         assert bean1.getId() == 'bean1'
 
     }
 
+    @Test
     void testGetInitMethodFromBeanDefinition() {
         BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans)
         def actual = invoker.getInitMethodFromBeanDefinition(bean, beanDefinition).toString()
         def expected = 'public void com.lysenkova.ioc.testentities.UserService.init()'
-        assertEquals(expected, actual)
+        assert expected == actual
 
     }
 }
