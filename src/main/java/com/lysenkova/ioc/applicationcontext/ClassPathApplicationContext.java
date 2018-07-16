@@ -146,11 +146,11 @@ public class ClassPathApplicationContext implements ApplicationContext {
         createBeansFromBeanDefinitions();
         new DependencyInjector().inject(beanDefinitions, beans);
         new RefDependencyInjector().inject(beanDefinitions, beans);
-        
+
         BeanPostProcessorInvoker beanPostProcessorInvoker = new BeanPostProcessorInvoker(postProcessorBeans, beans);
-        beanPostProcessorInvoker.invokeBeforeMethod();
+        beans = beanPostProcessorInvoker.invokeBeforeMethod();
         beanPostProcessorInvoker.invokeInitMethod(beanDefinitions);
-        beanPostProcessorInvoker.invokeAfterMethod();
+        beans = beanPostProcessorInvoker.invokeAfterMethod();
     }
 
 }
