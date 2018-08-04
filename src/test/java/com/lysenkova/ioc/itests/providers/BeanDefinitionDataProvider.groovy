@@ -1,4 +1,4 @@
-package com.lysenkova.ioc.applicationcontext.itests.providers
+package com.lysenkova.ioc.itests.providers
 
 import com.lysenkova.ioc.entity.BeanDefinition
 import org.testng.annotations.DataProvider

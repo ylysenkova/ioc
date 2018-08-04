@@ -1,6 +1,6 @@
 package com.lysenkova.ioc.testentities;
 
-import com.lysenkova.ioc.applicationcontext.BeanFactoryPostProcessor;
+import com.lysenkova.ioc.context.BeanFactoryPostProcessor;
 import com.lysenkova.ioc.entity.BeanDefinition;
 
 import java.util.HashMap;

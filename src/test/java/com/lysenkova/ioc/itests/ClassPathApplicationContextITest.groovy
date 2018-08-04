@@ -1,8 +1,9 @@
-package com.lysenkova.ioc.applicationcontext.itests
+package com.lysenkova.ioc.itests
 
-import com.lysenkova.ioc.applicationcontext.ApplicationContext
-import com.lysenkova.ioc.applicationcontext.ClassPathApplicationContext
-import com.lysenkova.ioc.applicationcontext.itests.providers.BeanDefinitionDataProvider
+import com.lysenkova.ioc.context.ApplicationContext
+import com.lysenkova.ioc.context.ClassPathApplicationContext
+import com.lysenkova.ioc.exception.NotUniqueBeanExeption
+import com.lysenkova.ioc.itests.providers.BeanDefinitionDataProvider
 import com.lysenkova.ioc.beanparser.BeanDefinitionReader
 import com.lysenkova.ioc.beanparser.xml.XMLBeanDefinitionReader
 import com.lysenkova.ioc.exception.BeanInstantiationException
@@ -101,7 +102,7 @@ class ClassPathApplicationContextITest {
         applicationContext.getBean("userService")
     }
 
-    @Test(expectedExceptionsMessageRegExp = "For class com.lysenkova.ioc.testentities.PaymentService more than 1 bean initialized.", expectedExceptions = BeanInstantiationException.class)
+    @Test(expectedExceptionsMessageRegExp = "For class com.lysenkova.ioc.testentities.PaymentService more than 1 bean initialized.", expectedExceptions = NotUniqueBeanExeption.class)
     void getBeanForTheSameClass() {
         ApplicationContext applicationContext = new ClassPathApplicationContext("context.xml", "email-context.xml")
         applicationContext.getBean(PaymentService.class)

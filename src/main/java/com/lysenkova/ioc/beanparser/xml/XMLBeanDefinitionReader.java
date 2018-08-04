@@ -12,8 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class XMLBeanDefinitionReader implements BeanDefinitionReader {
+    private static final SAXParserFactory SAX_PARSER_FACTORY = SAXParserFactory.newInstance();
+
     private String[] paths;
-    private List<BeanDefinition> beanDefinitions = new ArrayList<>();
 
     public XMLBeanDefinitionReader(String[] paths) {
         ClassLoader classLoader = getClass().getClassLoader();
@@ -29,18 +30,18 @@ public class XMLBeanDefinitionReader implements BeanDefinitionReader {
     }
 
     public List<BeanDefinition> readBeanDefinitions() throws BeanInstantiationException {
-        SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
         try {
-            SAXParser saxParser = saxParserFactory.newSAXParser();
-            BeanParserHandler beanParserHandler = new BeanParserHandler();
+            SAXParser saxParser = SAX_PARSER_FACTORY.newSAXParser();
+            List<BeanDefinition> beanDefinitions = new ArrayList<>();
+
             for (String path : paths) {
+                BeanParserHandler beanParserHandler = new BeanParserHandler();
                 saxParser.parse(path, beanParserHandler);
+                beanDefinitions.addAll(beanParserHandler.getBeanDefinitions());
             }
-            beanDefinitions.addAll(beanParserHandler.getBeanDefinitions());
+            return beanDefinitions;
         } catch (Exception e) {
             throw new RuntimeException("Exception during parsing file with beans.");
         }
-
-        return beanDefinitions;
     }
 }

@@ -1,4 +1,4 @@
-package com.lysenkova.ioc.applicationcontext.injector;
+package com.lysenkova.ioc.injector;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.lysenkova.ioc.entity.Bean;

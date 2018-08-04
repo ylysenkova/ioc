@@ -1,4 +1,4 @@
-package com.lysenkova.ioc.applicationcontext;
+package com.lysenkova.ioc.context;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.lysenkova.ioc.entity.Bean;
@@ -21,8 +21,7 @@ public class BeanPostProcessorInvoker {
 
     public List<Bean> invokeBeforeMethod() {
         for (Bean postProcessorBean : postProcessorBeans) {
-            beans = beans.stream().peek(bean -> ((BeanPostProcessor) postProcessorBean.getValue())
-                    .postProcessBeforeInitialization(bean, bean.getId()))
+            beans = beans.stream().peek(bean -> ((BeanPostProcessor) postProcessorBean.getValue()).postProcessBeforeInitialization(bean, bean.getId()))
                     .collect(Collectors.toList());
         }
         return beans;

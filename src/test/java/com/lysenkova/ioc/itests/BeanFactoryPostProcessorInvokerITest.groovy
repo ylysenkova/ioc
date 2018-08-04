@@ -1,8 +1,8 @@
-package com.lysenkova.ioc.applicationcontext.itests
+package com.lysenkova.ioc.itests
 
-import com.lysenkova.ioc.applicationcontext.ApplicationContext
-import com.lysenkova.ioc.applicationcontext.BeanFactoryPostProcessorInvoker
-import com.lysenkova.ioc.applicationcontext.ClassPathApplicationContext
+import com.lysenkova.ioc.context.ApplicationContext
+import com.lysenkova.ioc.context.BeanFactoryPostProcessorInvoker
+import com.lysenkova.ioc.context.ClassPathApplicationContext
 import com.lysenkova.ioc.entity.BeanDefinition
 import org.junit.Test
 

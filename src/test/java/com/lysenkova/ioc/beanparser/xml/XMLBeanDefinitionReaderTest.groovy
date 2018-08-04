@@ -1,7 +1,7 @@
 package com.lysenkova.ioc.beanparser.xml
 
 import com.lysenkova.ioc.beanparser.BeanDefinitionReader
-import com.lysenkova.ioc.applicationcontext.itests.providers.BeanDefinitionDataProvider
+import com.lysenkova.ioc.itests.providers.BeanDefinitionDataProvider
 import org.testng.annotations.Test
 
 import static org.testng.Assert.assertEquals

@@ -1,4 +1,4 @@
-package com.lysenkova.ioc.applicationcontext
+package com.lysenkova.ioc.context
 
 import com.lysenkova.ioc.entity.Bean
 import com.lysenkova.ioc.entity.BeanDefinition
@@ -60,9 +60,9 @@ class BeanPostProcessorInvokerTest {
 
     @Test
     void "Invoke before method"() {
-        BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans)
+        BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans, beans)
         beanPostProcessBeans.add(postProcessBean)
-        invoker.invokeBeforeMethod(beans)
+        invoker.invokeBeforeMethod()
         def actual = bean.getId()
         def expected = 'changedBean'
         assert expected == actual
@@ -72,8 +72,8 @@ class BeanPostProcessorInvokerTest {
     @Test
     void testInvokeBeforeMethodNeg() {
         def beanPostProcessBeans = new ArrayList()
-        BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans)
-        invoker.invokeBeforeMethod(beans)
+        BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans, beans)
+        invoker.invokeBeforeMethod()
         def actual = bean.getId()
         def expected = 'bean'
         assert expected == actual
@@ -82,8 +82,8 @@ class BeanPostProcessorInvokerTest {
 
     @Test
     void testInvokeInitMethod() {
-        BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans)
-        invoker.invokeInitMethod(beans, beanDefinitions)
+        BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans, beans)
+        invoker.invokeInitMethod(beanDefinitions)
         def actual = userService.getNumber()
         def expected = 3
         assert expected == actual
@@ -91,8 +91,8 @@ class BeanPostProcessorInvokerTest {
 
     @Test
     void testInvokeAfterMethod() {
-        BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans)
-        invoker.invokeAfterMethod(beans)
+        BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans, beans)
+        invoker.invokeAfterMethod()
         def actual = bean.getId()
         def expected = 'changedBean'
         assert expected == actual
@@ -102,8 +102,8 @@ class BeanPostProcessorInvokerTest {
     @Test
     void testInvokeAfterMethodNeg() {
         def beanPostProcessBeans = new ArrayList()
-        BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans)
-        invoker.invokeAfterMethod(beans)
+        BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans, beans)
+        invoker.invokeAfterMethod()
         def actual = bean.getId()
         def expected = 'bean'
         assert expected == actual
@@ -113,7 +113,7 @@ class BeanPostProcessorInvokerTest {
 
     @Test
     void testGetInitMethodFromBeanDefinition() {
-        BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans)
+        BeanPostProcessorInvoker invoker = new BeanPostProcessorInvoker(beanPostProcessBeans, beans)
         def actual = invoker.getInitMethodFromBeanDefinition(bean, beanDefinition).toString()
         def expected = 'public void com.lysenkova.ioc.testentities.UserService.init()'
         assert expected == actual

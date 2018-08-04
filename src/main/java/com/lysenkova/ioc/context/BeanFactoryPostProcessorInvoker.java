@@ -1,4 +1,4 @@
-package com.lysenkova.ioc.applicationcontext;
+package com.lysenkova.ioc.context;
 
 import com.lysenkova.ioc.entity.BeanDefinition;
 
@@ -16,10 +16,8 @@ public class BeanFactoryPostProcessorInvoker {
 
     public void invokePostProcessBeanFactoryMethod() {
         List<BeanFactoryPostProcessor> factories = createFactoryBeans();
-        if (factories != null) {
-            for (BeanFactoryPostProcessor factory : factories) {
-                factory.postProcessBeanFactory(beanDefinitions);
-            }
+        for (BeanFactoryPostProcessor factory : factories) {
+            factory.postProcessBeanFactory(beanDefinitions);
         }
     }
 
@@ -27,7 +25,9 @@ public class BeanFactoryPostProcessorInvoker {
         List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<>();
         for (BeanDefinition factoryBeanDefinition : factoryBeanDefinitions) {
             try {
-                beanFactoryPostProcessors.add((BeanFactoryPostProcessor) Class.forName(factoryBeanDefinition.getBeanClassName()).newInstance());
+                Class<?> factoryClazz = Class.forName(factoryBeanDefinition.getBeanClassName());
+                BeanFactoryPostProcessor beanFactoryPostProcessor = (BeanFactoryPostProcessor) factoryClazz.newInstance();
+                beanFactoryPostProcessors.add(beanFactoryPostProcessor);
             } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
                 throw new RuntimeException("Can not invoke postProcessBeanFactory method", e);
             }

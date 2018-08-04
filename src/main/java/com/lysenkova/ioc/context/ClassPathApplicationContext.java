@@ -1,8 +1,9 @@
-package com.lysenkova.ioc.applicationcontext;
+package com.lysenkova.ioc.context;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.lysenkova.ioc.applicationcontext.injector.DependencyInjector;
-import com.lysenkova.ioc.applicationcontext.injector.RefDependencyInjector;
+import com.lysenkova.ioc.exception.NotUniqueBeanExeption;
+import com.lysenkova.ioc.injector.DependencyInjector;
+import com.lysenkova.ioc.injector.RefDependencyInjector;
 import com.lysenkova.ioc.beanparser.BeanDefinitionReader;
 import com.lysenkova.ioc.beanparser.xml.XMLBeanDefinitionReader;
 import com.lysenkova.ioc.entity.Bean;
@@ -17,7 +18,6 @@ public class ClassPathApplicationContext implements ApplicationContext {
     private List<Bean> beans;
     private List<Bean> postProcessorBeans;
     private List<BeanDefinition> beanDefinitions;
-    private List<BeanDefinition> factoryBeanDefinitions;
 
     public ClassPathApplicationContext() {
     }
@@ -33,12 +33,22 @@ public class ClassPathApplicationContext implements ApplicationContext {
 
     @Override
     public <T> T getBean(Class<T> clazz) {
-        validateBeanClass(beans, clazz);
+        boolean isExist = false;
+        T result = null;
         for (Bean bean : beans) {
             if (clazz.isAssignableFrom(bean.getValue().getClass())) {
-                return clazz.cast(bean.getValue());
+                if (!isExist) {
+                    result = clazz.cast(bean.getValue());
+                    isExist = true;
+                } else {
+                    throw new NotUniqueBeanExeption("For " + clazz + " more than 1 bean initialized.");
+                }
             }
         }
+        if (isExist) {
+            return result;
+        }
+
         throw new BeanInstantiationException("Bean was not found for Class: " + clazz);
     }
 
@@ -85,25 +95,22 @@ public class ClassPathApplicationContext implements ApplicationContext {
 
     @VisibleForTesting
     void createBeansFromBeanDefinitions() {
-        beanDefinitions = reader.readBeanDefinitions();
-        try {
-            factoryBeanDefinitions = getFactoryPostProcessorBeanDefinition(beanDefinitions);
-            new BeanFactoryPostProcessorInvoker(beanDefinitions, factoryBeanDefinitions).invokePostProcessBeanFactoryMethod();
-            for (BeanDefinition beanDefinition : beanDefinitions) {
-                Bean bean = new Bean();
-                bean.setId(beanDefinition.getId());
-                Object beanValue = Class.forName(beanDefinition.getBeanClassName()).newInstance();
-                bean.setValue(beanValue);
-                addBean(bean);
-                if (bean.getValue() instanceof BeanPostProcessor) {
-                    postProcessorBeans.add(bean);
-                }
+    try {
+        for (BeanDefinition beanDefinition : beanDefinitions) {
+            Bean bean = new Bean();
+            bean.setId(beanDefinition.getId());
+            Object beanValue = Class.forName(beanDefinition.getBeanClassName()).newInstance();
+            bean.setValue(beanValue);
+            addBean(bean);
+            if (bean.getValue() instanceof BeanPostProcessor) {
+                postProcessorBeans.add(bean);
             }
-            beans.removeAll(postProcessorBeans);
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            throw new BeanInstantiationException("Bean creation error.", e);
         }
+        beans.removeAll(postProcessorBeans);
+    } catch(ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+        throw new BeanInstantiationException("Bean creation error.", e);
     }
+}
 
     private void addBean(Bean bean) {
         for (Bean beanElement : beans) {
@@ -114,19 +121,8 @@ public class ClassPathApplicationContext implements ApplicationContext {
         beans.add(bean);
     }
 
-    private void validateBeanClass(List<Bean> beans, Class clazz) {
-        List<Bean> beansForTheSameClass = new ArrayList<>();
-        for (Bean bean : beans) {
-            if (bean.getValue().getClass() == clazz) {
-                beansForTheSameClass.add(bean);
-            }
-        }
-        if (beansForTheSameClass.size() > 1) {
-            throw new BeanInstantiationException("For " + clazz + " more than 1 bean initialized.");
-        }
-    }
-
     private List<BeanDefinition> getFactoryPostProcessorBeanDefinition(List<BeanDefinition> beanDefinitions) throws ClassNotFoundException {
+        List<BeanDefinition> factoryBeanDefinitions = new ArrayList<>();
         for (BeanDefinition beanDefinition : beanDefinitions) {
             Class clazz = Class.forName(beanDefinition.getBeanClassName());
             if (BeanFactoryPostProcessor.class.isAssignableFrom(clazz)) {
@@ -140,17 +136,34 @@ public class ClassPathApplicationContext implements ApplicationContext {
     private void startInitialization() {
         beans = new ArrayList<>();
         postProcessorBeans = new ArrayList<>();
-        beanDefinitions = new ArrayList<>();
-        factoryBeanDefinitions = new ArrayList<>();
 
+        //read beanDefinitions
+        beanDefinitions = reader.readBeanDefinitions();
+
+        //run factories
+        try {
+            List<BeanDefinition> factoryBeanDefinitions = getFactoryPostProcessorBeanDefinition(beanDefinitions);
+            new BeanFactoryPostProcessorInvoker(beanDefinitions, factoryBeanDefinitions).invokePostProcessBeanFactoryMethod();
+        } catch (ClassNotFoundException e1) {
+            throw new BeanInstantiationException("Bean creation error.", e1);
+        }
+
+        //construct
         createBeansFromBeanDefinitions();
+
+        //dependency injection
         new DependencyInjector().inject(beanDefinitions, beans);
         new RefDependencyInjector().inject(beanDefinitions, beans);
 
         BeanPostProcessorInvoker beanPostProcessorInvoker = new BeanPostProcessorInvoker(postProcessorBeans, beans);
+
+        //before initialization
         beans = beanPostProcessorInvoker.invokeBeforeMethod();
+
+        //initialization
         beanPostProcessorInvoker.invokeInitMethod(beanDefinitions);
+
+        //after initialization
         beans = beanPostProcessorInvoker.invokeAfterMethod();
     }
-
 }

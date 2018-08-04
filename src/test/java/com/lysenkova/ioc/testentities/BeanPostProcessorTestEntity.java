@@ -1,6 +1,6 @@
 package com.lysenkova.ioc.testentities;
 
-import com.lysenkova.ioc.applicationcontext.BeanPostProcessor;
+import com.lysenkova.ioc.context.BeanPostProcessor;
 import com.lysenkova.ioc.entity.Bean;
 
 public class BeanPostProcessorTestEntity implements BeanPostProcessor {

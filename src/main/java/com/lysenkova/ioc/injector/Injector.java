@@ -1,11 +1,10 @@
-package com.lysenkova.ioc.applicationcontext.injector;
+package com.lysenkova.ioc.injector;
 
 import com.lysenkova.ioc.entity.Bean;
 import com.lysenkova.ioc.entity.BeanDefinition;
 import com.lysenkova.ioc.exception.BeanInstantiationException;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
